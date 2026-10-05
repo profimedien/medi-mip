@@ -21,7 +21,7 @@ class InboxNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $mail = (new MailMessage)->subject($this->subject.' · medi Interaktionsportal')
+        $mail = (new MailMessage)->subject($this->subject.' · MIP')
             ->greeting($this->subject)
             ->line($this->intro);
         foreach (preg_split("/\n/", $this->body) as $line) {
@@ -31,6 +31,6 @@ class InboxNotification extends Notification implements ShouldQueue
             $mail->action('Im Portal ansehen', $this->url);
         }
 
-        return $mail->salutation('Ihr medi Interaktionsportal');
+        return $mail->salutation('Ihr MIP · Mitarbeiter Informationsportal');
     }
 }

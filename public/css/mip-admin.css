@@ -1,0 +1,79 @@
+/* MIP-Redaktion: Optik an das Mitarbeiter-Portal angleichen (Farben, Rundungen, Navigation) */
+:root {
+    --mip-blue: #0032ba;
+    --mip-navy: #003d8f;
+    --mip-sky: #1e88d2;
+    --mip-red: #e0003a;
+    --mip-gray: #485057;
+    --mip-bg: #f4f6fa;
+}
+
+/* Grundfläche wie im Portal */
+.fi-body, .fi-layout, .fi-main-ctn { background-color: var(--mip-bg) !important; }
+.fi-body { color: var(--mip-gray); }
+
+/* Kopfzeile */
+.fi-topbar, .fi-topbar > nav { background: rgba(255, 255, 255, .95) !important; backdrop-filter: blur(8px); box-shadow: none !important; border-bottom: 1px solid rgba(0, 0, 0, .05); }
+
+/* Seitenleiste: transparent auf Grundfläche, aktive Seite als blauer Balken */
+.fi-sidebar { background: transparent !important; }
+.fi-sidebar-nav { padding-top: 1.25rem; }
+.fi-sidebar-item-btn { border-radius: .75rem !important; padding-block: .55rem !important; transition: background-color .15s; }
+.fi-sidebar-item-btn:hover { background-color: #fff !important; }
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn { background-color: var(--mip-blue) !important; }
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon,
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-label { color: #fff !important; }
+.fi-sidebar-item-label { font-weight: 500; color: var(--mip-gray); }
+.fi-sidebar-group-label { text-transform: uppercase; letter-spacing: .06em; font-size: .7rem !important; color: rgba(72, 80, 87, .7) !important; }
+
+/* Überschriften in medi-Navy */
+.fi-header-heading, .fi-section-header-heading, .fi-simple-header-heading, .fi-modal-heading { color: var(--mip-navy) !important; letter-spacing: -.01em; }
+
+/* Karten, Tabellen, Abschnitte: runder und weicher wie im Portal */
+.fi-section, .fi-ta-ctn, .fi-wi-stats-overview-stat, .fi-fo-repeater-item, .fi-modal-window {
+    border-radius: 1rem !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .04) !important;
+    border-color: rgba(0, 0, 0, .05) !important;
+}
+.fi-ta-ctn { overflow: hidden; }
+.fi-btn, .fi-input-wrp, .fi-select-input, .fi-dropdown-panel { border-radius: .75rem !important; }
+.fi-badge { border-radius: 999px !important; }
+
+/* Kennzahlen: Zahl in medi-Blau */
+.fi-wi-stats-overview-stat-value { color: var(--mip-blue) !important; }
+
+/* Anmeldeseite der Redaktion */
+.fi-simple-layout { background: radial-gradient(1200px 600px at 50% -10%, rgba(0, 50, 186, .08), transparent 60%), var(--mip-bg) !important; }
+.fi-simple-main { border-radius: 1.25rem !important; }
+
+/* Marke in der Kopfzeile */
+.mip-brand { display: flex; align-items: center; gap: .75rem; }
+.mip-brand img { height: 2.4rem; width: auto; }
+.mip-brand-text { border-left: 1px solid rgba(0, 0, 0, .1); padding-left: .75rem; line-height: 1.1; }
+.mip-brand-text b { display: block; font-size: 1.1rem; font-weight: 700; color: var(--mip-navy); letter-spacing: -.01em; }
+.mip-brand-text span { font-size: .7rem; font-weight: 500; color: var(--mip-gray); }
+
+/* Begrüßung auf dem Dashboard */
+.mip-hero { position: relative; overflow: hidden; border-radius: 1.25rem; padding: 1.75rem; color: #fff;
+    background: linear-gradient(135deg, var(--mip-blue) 0%, var(--mip-navy) 55%, #0a2a6e 100%); }
+.mip-hero::after { content: ""; position: absolute; right: -60px; top: -60px; width: 260px; height: 260px; border-radius: 50%; background: rgba(255, 255, 255, .07); }
+.mip-hero h2 { font-size: 1.6rem; font-weight: 700; margin: 0 0 .25rem; color: #fff; }
+.mip-hero p { margin: 0; opacity: .85; font-size: .9rem; }
+.mip-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: .75rem; margin-top: 1.25rem; position: relative; z-index: 1; }
+.mip-action { display: flex; align-items: center; gap: .6rem; padding: .8rem 1rem; border-radius: .9rem; background: rgba(255, 255, 255, .12); color: #fff; font-weight: 500; font-size: .9rem; text-decoration: none; transition: background .15s, transform .15s; }
+.mip-action:hover { background: rgba(255, 255, 255, .22); transform: translateY(-1px); }
+.mip-action svg { width: 1.25rem; height: 1.25rem; flex-shrink: 0; }
+
+/* Rücklauf-Übersicht */
+.mip-card { background: #fff; border-radius: 1rem; padding: 1.25rem; box-shadow: 0 1px 2px rgba(0, 0, 0, .04); border: 1px solid rgba(0, 0, 0, .05); }
+.mip-card h3 { margin: 0 0 .9rem; font-size: 1rem; font-weight: 700; color: var(--mip-navy); }
+.mip-row { display: block; padding: .7rem 0; border-top: 1px solid rgba(0, 0, 0, .05); text-decoration: none; color: inherit; }
+.mip-row:first-of-type { border-top: 0; }
+.mip-row-head { display: flex; justify-content: space-between; gap: 1rem; font-size: .875rem; }
+.mip-row-head b { font-weight: 500; color: var(--mip-navy); }
+.mip-row-head span { color: var(--mip-gray); white-space: nowrap; font-size: .8rem; }
+.mip-bar { height: .45rem; border-radius: 999px; background: var(--mip-bg); margin-top: .45rem; overflow: hidden; }
+.mip-bar > i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--mip-sky), var(--mip-blue)); }
+.mip-empty { font-size: .875rem; color: var(--mip-gray); }
+.mip-grid-2 { display: grid; gap: 1.5rem; grid-template-columns: 1fr; }
+@media (min-width: 1024px) { .mip-grid-2 { grid-template-columns: 1fr 1fr; } }

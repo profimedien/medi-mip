@@ -24,7 +24,7 @@ class FormsTable
                     ->state(fn (Form $r) => $r->responses()->count().' / '.$r->audienceMembers()->count()),
                 TextColumn::make('published_at')->label('Veröffentlicht')->dateTime('d.m.Y')->placeholder('Entwurf')->toggleable(),
             ])
-            ->recordActions([EditAction::make()->label('Bearbeiten und Auswertung'), DeleteAction::make()])
+            ->recordActions([EditAction::make()->iconButton()->tooltip('Bearbeiten und Antworten ansehen'), DeleteAction::make()->iconButton()->tooltip('Löschen')])
             ->toolbarActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }
 }

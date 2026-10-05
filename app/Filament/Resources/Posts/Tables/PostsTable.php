@@ -22,18 +22,18 @@ class PostsTable
                 TextColumn::make('title')->label('Titel')->searchable()->wrap()->weight('medium'),
                 TextColumn::make('audience')->label('Zielgruppe')->state(fn (Post $r) => $r->audienceLabel())->badge()->color('info'),
                 TextColumn::make('published_at')->label('Veröffentlicht')->dateTime('d.m.Y H:i')->sortable()->placeholder('Entwurf'),
-                IconColumn::make('pinned')->label('Angeheftet')->boolean()->toggleable(),
+                IconColumn::make('pinned')->label('Angeheftet')->icon(fn ($state) => $state ? 'heroicon-s-bookmark' : 'heroicon-o-minus-small')->color(fn ($state) => $state ? 'primary' : 'gray')->toggleable(),
                 TextColumn::make('reads_count')->counts('reads')->label('Gelesen')->sortable(),
                 TextColumn::make('confirmations')->label('Bestätigt')
                     ->state(fn (Post $r) => $r->requires_confirmation ? $r->reads()->whereNotNull('confirmed_at')->count().' / '.$r->audienceMembers()->count() : '–'),
             ])
             ->recordActions([
-                Action::make('report')->label('Auswertung')->icon('heroicon-o-chart-bar')
+                Action::make('report')->label('Auswertung')->icon('heroicon-o-chart-bar')->iconButton()->tooltip('Wer hat gelesen und bestätigt?')
                     ->modalHeading(fn (Post $r) => 'Auswertung: '.$r->title)
                     ->modalContent(fn (Post $r) => view('filament.read-report', self::report($r)))
                     ->modalSubmitAction(false)->modalCancelActionLabel('Schließen'),
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()->iconButton()->tooltip('Bearbeiten'),
+                DeleteAction::make()->iconButton()->tooltip('Löschen'),
             ])
             ->toolbarActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }

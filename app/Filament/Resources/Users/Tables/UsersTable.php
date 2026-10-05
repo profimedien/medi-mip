@@ -6,6 +6,7 @@ use App\Models\Department;
 use App\Models\Location;
 use App\Models\User;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
@@ -27,7 +28,7 @@ class UsersTable
             ->columns([
                 TextColumn::make('last_name')->label('Name')->formatStateUsing(fn (User $r) => $r->last_name.', '.$r->first_name)
                     ->searchable(['first_name', 'last_name', 'username', 'personnel_number'])->sortable()->weight('medium'),
-                TextColumn::make('username')->label('Benutzername')->toggleable(),
+                TextColumn::make('username')->label('Benutzername')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('location.short_name')->label('Standort')->sortable(),
                 TextColumn::make('departments.name')->label('Abteilungen')->badge()->limitList(2),
                 TextColumn::make('admin_role')->label('Rolle')->badge()->color('warning')->toggleable()
@@ -37,7 +38,7 @@ class UsersTable
                 TextColumn::make('status')->label('Status')->badge()
                     ->formatStateUsing(fn ($state) => self::STATUS[$state] ?? $state)
                     ->color(fn ($state) => match ($state) { 'active' => 'success', 'invited' => 'warning', default => 'danger' }),
-                TextColumn::make('last_login_at')->label('Letzte Anmeldung')->since()->sortable()->toggleable(),
+                TextColumn::make('last_login_at')->label('Letzte Anmeldung')->since()->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('location_id')->label('Standort')->options(fn () => Location::orderBy('sort')->pluck('short_name', 'id')),
@@ -45,7 +46,8 @@ class UsersTable
                 SelectFilter::make('status')->label('Status')->options(self::STATUS),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()->iconButton()->tooltip('Bearbeiten'),
+                ActionGroup::make([
                 Action::make('sheet')->label('Zugangszettel')->icon('heroicon-o-printer')->color('gray')
                     ->visible(fn (User $r) => filled($r->start_code))
                     ->url(fn (User $r) => route('access-sheet', ['ids' => $r->id]), shouldOpenInNewTab: true),
@@ -63,6 +65,7 @@ class UsersTable
                     ->requiresConfirmation()
                     ->hidden(fn (User $r) => $r->id === auth()->id())
                     ->action(fn (User $r) => $r->update(['status' => $r->status === 'disabled' ? ($r->password ? 'active' : 'invited') : 'disabled'])),
+                ])->tooltip('Zugang'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -13,8 +13,11 @@
     <header class="sticky top-0 z-30 border-b border-black/5 bg-white/95 backdrop-blur">
         <div class="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4">
             <a href="{{ route('home') }}" wire:navigate class="flex items-center gap-3">
-                <img src="/images/medi-logo.svg" alt="medi Gesundheitsgruppe" class="h-9 w-auto">
-                <span class="hidden border-l border-black/10 pl-3 text-sm font-medium text-medi-gray sm:block">Interaktionsportal</span>
+                <img src="/images/medi-logo-kompakt.svg" alt="medi Gesundheitsgruppe" class="h-10 w-auto">
+                <span class="border-l border-black/10 pl-3 leading-tight">
+                    <span class="block text-lg font-bold tracking-tight text-medi-navy">MIP</span>
+                    <span class="hidden text-[11px] font-medium text-medi-gray sm:block">Mitarbeiter Informationsportal</span>
+                </span>
             </a>
             <div class="ml-auto flex items-center gap-1">
                 <a href="{{ route('notifications') }}" wire:navigate class="relative rounded-xl p-2 text-medi-gray hover:bg-medi-bg" aria-label="Mitteilungen">

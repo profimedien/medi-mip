@@ -15,6 +15,8 @@ class PortalStats extends StatsOverviewWidget
 {
     protected static ?int $sort = 1;
 
+    protected ?string $heading = null;
+
     protected function getStats(): array
     {
         $admin = auth()->user();

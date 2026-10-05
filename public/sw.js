@@ -1,4 +1,4 @@
-// Service Worker medi Interaktionsportal: Offline-Hinweis und Push-Mitteilungen
+// Service Worker MIP: Offline-Hinweis und Push-Mitteilungen
 const OFFLINE_URL = '/offline.html';
 
 self.addEventListener('install', (event) => {
@@ -17,7 +17,7 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('push', (event) => {
     const data = event.data ? event.data.json() : {};
     event.waitUntil(
-        self.registration.showNotification(data.title || 'medi Interaktionsportal', {
+        self.registration.showNotification(data.title || 'MIP', {
             body: data.body || '',
             icon: '/images/icon-192.png',
             badge: '/images/icon-192.png',

@@ -12,6 +12,8 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
+use Illuminate\Support\HtmlString;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -27,9 +29,11 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->brandName('medi Redaktion')
-            ->brandLogo(asset('images/medi-logo.svg'))
+            ->brandName('MIP Redaktion')
+            ->brandLogo(fn () => view('filament.brand'))
             ->brandLogoHeight('2.5rem')
+            ->darkMode(false)
+            ->renderHook(PanelsRenderHook::HEAD_END, fn () => new HtmlString('<link rel="stylesheet" href="'.asset('css/mip-admin.css').'?v='.@filemtime(public_path('css/mip-admin.css')).'">'))
             ->favicon(asset('images/icon-192.png'))
             ->colors([
                 // V3-Palette: die Markenfarbe liegt auf Stufe 500, Buttons bekommen Stufe 600 mit weißer Schrift

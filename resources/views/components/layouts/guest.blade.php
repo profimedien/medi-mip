@@ -6,8 +6,9 @@
 <body class="grid min-h-screen place-items-center p-4">
     <div class="w-full max-w-sm">
         <div class="mb-8 text-center">
-            <img src="/images/medi-logo.svg" alt="medi Gesundheitsgruppe" class="mx-auto h-14 w-auto">
-            <p class="mt-3 text-sm font-medium text-medi-gray">Interaktionsportal</p>
+            <img src="/images/medi-logo.svg" alt="medi Gesundheitsgruppe" class="mx-auto h-20 w-auto">
+            <p class="mt-6 text-3xl font-bold tracking-tight text-medi-navy">MIP</p>
+            <p class="text-sm font-medium text-medi-gray">Mitarbeiter Informationsportal</p>
         </div>
         <div class="card p-6">
             {{ $slot }}

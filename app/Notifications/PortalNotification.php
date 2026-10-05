@@ -49,11 +49,11 @@ class PortalNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)->subject($this->title.' · medi Interaktionsportal')
+        return (new MailMessage)->subject($this->title.' · MIP')
             ->greeting('Hallo '.$notifiable->first_name.',')
             ->line($this->body)
             ->action('Im Portal öffnen', $this->url)
-            ->salutation('Ihr medi Interaktionsportal');
+            ->salutation('Ihr MIP · Mitarbeiter Informationsportal');
     }
 
     public function toWebPush(object $notifiable, $notification): WebPushMessage
