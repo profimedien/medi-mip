@@ -35,7 +35,7 @@ class FormResponsesExport
                     return is_array($a) ? implode(', ', $a) : (is_bool($a) ? ($a ? 'Ja' : 'Nein') : (string) $a);
                 })->all();
                 $writer->addRow(Row::fromValues(array_merge(
-                    [$user->last_name, $user->first_name, $user->location?->short_name ?? '', $r ? (Form::CHOICES[$r->choice] ?? 'abgegeben') : 'keine Antwort'],
+                    [$user->last_name, $user->first_name, $user->location?->short_name ?? '', $r ? ($r->choice ?: 'abgegeben') : 'keine Antwort'],
                     $answers,
                     [$r?->signature_path ? 'ja' : '', $r?->updated_at?->format('d.m.Y H:i') ?? ''],
                 )));

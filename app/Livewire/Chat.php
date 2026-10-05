@@ -29,6 +29,14 @@ class Chat extends Component
 
     public bool $newChat = false;
 
+    public bool $newGroup = false;
+
+    public string $groupName = '';
+
+    public array $groupMembers = [];
+
+    public string $memberSearch = '';
+
     public int $limit = 50;
 
     public function mount(?ChatGroup $group = null): void
@@ -81,6 +89,49 @@ class Chat extends Component
         $this->dispatch('chat-sent');
     }
 
+    public function addMember(int $id): void
+    {
+        if (! in_array($id, $this->groupMembers, true)) {
+            $this->groupMembers[] = $id;
+        }
+        $this->memberSearch = '';
+    }
+
+    public function removeMember(int $id): void
+    {
+        $this->groupMembers = array_values(array_diff($this->groupMembers, [$id]));
+    }
+
+    /** Eigene Gruppe: wer sie anlegt, moderiert sie */
+    public function createGroup()
+    {
+        $this->validate([
+            'groupName' => ['required', 'string', 'min:3', 'max:60'],
+            'groupMembers' => ['required', 'array', 'min:1'],
+            'groupMembers.*' => ['integer', 'exists:users,id'],
+        ], ['groupMembers.required' => 'Bitte mindestens eine Person hinzufügen.'], ['groupName' => 'Gruppenname']);
+
+        $group = ChatGroup::create(['type' => 'custom', 'name' => $this->groupName, 'last_message_at' => now()]);
+        ChatMember::create(['chat_group_id' => $group->id, 'user_id' => auth()->id(), 'is_moderator' => true]);
+        foreach (array_unique($this->groupMembers) as $id) {
+            if ($id !== auth()->id()) {
+                ChatMember::create(['chat_group_id' => $group->id, 'user_id' => $id]);
+            }
+        }
+        ChatMessage::create(['chat_group_id' => $group->id, 'user_id' => auth()->id(), 'body' => auth()->user()->first_name.' hat die Gruppe „'.$this->groupName.'“ erstellt.']);
+        $this->reset('newGroup', 'groupName', 'groupMembers', 'memberSearch');
+
+        return $this->redirectRoute('chat', ['group' => $group], navigate: true);
+    }
+
+    public function leaveGroup()
+    {
+        abort_unless($this->group && $this->group->type === 'custom', 403);
+        ChatMember::where('chat_group_id', $this->group->id)->where('user_id', auth()->id())->delete();
+
+        return $this->redirectRoute('chat', navigate: true);
+    }
+
     public function deleteMessage(int $id): void
     {
         $message = ChatMessage::where('chat_group_id', $this->group?->id)->findOrFail($id);
@@ -109,7 +160,15 @@ class Chat extends Component
                 ->with('location')->limit(8)->get()
             : collect();
 
+        $memberResults = $this->newGroup && strlen($this->memberSearch) >= 2
+            ? User::where('status', 'active')->where('id', '!=', $user->id)->whereNotIn('id', $this->groupMembers)
+                ->where(fn ($q) => $q->where('first_name', 'like', "%{$this->memberSearch}%")->orWhere('last_name', 'like', "%{$this->memberSearch}%"))
+                ->with('location')->limit(6)->get()
+            : collect();
+
         return view('livewire.chat', [
+            'memberResults' => $memberResults,
+            'selectedMembers' => User::whereIn('id', $this->groupMembers)->get(),
             'groups' => $groups,
             'messages' => $messages,
             'people' => $people,

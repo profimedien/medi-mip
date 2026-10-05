@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             StructureSeeder::class,
             DemoUserSeeder::class,
             DemoContentSeeder::class,
+            DemoImageSeeder::class,
         ]);
     }
 }

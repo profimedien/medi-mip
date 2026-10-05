@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\Event;
 use App\Models\Form;
 use App\Models\Post;
 use App\Support\AdminScope;
@@ -41,6 +42,9 @@ class RedaktionOverview extends Widget
                 'meta' => $p->published_at->format('d.m.'),
             ]);
 
-        return ['forms' => $forms, 'posts' => $posts];
+        $events = AdminScope::content(Event::query(), $admin)->where('starts_at', '>=', now()->startOfDay())
+            ->orderBy('starts_at')->limit(3)->get();
+
+        return ['forms' => $forms, 'posts' => $posts, 'events' => $events];
     }
 }

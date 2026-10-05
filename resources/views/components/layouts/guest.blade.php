@@ -8,7 +8,7 @@
         <div class="mb-8 text-center">
             <img src="/images/medi-logo.svg" alt="medi Gesundheitsgruppe" class="mx-auto h-20 w-auto">
             <p class="mt-6 text-3xl font-bold tracking-tight text-medi-navy">MIP</p>
-            <p class="text-sm font-medium text-medi-gray">Mitarbeiter Informationsportal</p>
+            <p class="text-sm font-medium text-medi-gray">Mitarbeiter-Informationsportal</p>
         </div>
         <div class="card p-6">
             {{ $slot }}

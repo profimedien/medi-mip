@@ -53,7 +53,7 @@ class PortalNotification extends Notification implements ShouldQueue
             ->greeting('Hallo '.$notifiable->first_name.',')
             ->line($this->body)
             ->action('Im Portal öffnen', $this->url)
-            ->salutation('Ihr MIP · Mitarbeiter Informationsportal');
+            ->salutation('Ihr MIP · Mitarbeiter-Informationsportal');
     }
 
     public function toWebPush(object $notifiable, $notification): WebPushMessage

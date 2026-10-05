@@ -28,7 +28,7 @@
         @if ($response && ! $editing)
             <div class="rounded-xl bg-medi-bg p-4 text-sm">
                 <p class="mb-2 font-medium text-medi-navy">Ihre Antwort vom {{ $response->updated_at->format('d.m.Y, H:i') }} Uhr</p>
-                @if ($response->choice)<p>{{ \App\Models\Form::CHOICES[$response->choice] ?? $response->choice }}</p>@endif
+                @if ($response->choice)<p>{{ $response->choice }}</p>@endif
                 @foreach ($form->fields as $field)
                     @php $a = $response->answers[$field->id] ?? null; @endphp
                     @if ($a !== null && $a !== '' && $a !== [])
@@ -46,11 +46,11 @@
                     <div>
                         <span class="label">Ihre Antwort</span>
                         <div class="flex flex-wrap gap-2">
-                            @foreach ($form->choiceOptions() as $value => $label)
+                            @foreach ($form->choiceOptions() as $label)
                                 <label @class(['cursor-pointer rounded-xl px-4 py-2.5 text-sm font-medium ring-1 transition',
-                                               'bg-medi-blue text-white ring-medi-blue' => $choice === $value,
-                                               'bg-white ring-black/10' => $choice !== $value])>
-                                    <input type="radio" wire:model.live="choice" value="{{ $value }}" class="sr-only"> {{ $label }}
+                                               'bg-medi-blue text-white ring-medi-blue' => $choice === $label,
+                                               'bg-white ring-black/10' => $choice !== $label])>
+                                    <input type="radio" wire:model.live="choice" value="{{ $label }}" class="sr-only"> {{ $label }}
                                 </label>
                             @endforeach
                         </div>
@@ -58,7 +58,7 @@
                     </div>
                 @endif
 
-                @if ($form->fields->isNotEmpty() && $choice !== 'absage')
+                @if ($form->fields->isNotEmpty() && ! \App\Models\Form::isDecline($choice))
                     <div class="space-y-4">
                         @foreach ($form->fields as $field)
                             <div>

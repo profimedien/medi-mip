@@ -16,7 +16,7 @@
                 <img src="/images/medi-logo-kompakt.svg" alt="medi Gesundheitsgruppe" class="h-10 w-auto">
                 <span class="border-l border-black/10 pl-3 leading-tight">
                     <span class="block text-lg font-bold tracking-tight text-medi-navy">MIP</span>
-                    <span class="hidden text-[11px] font-medium text-medi-gray sm:block">Mitarbeiter Informationsportal</span>
+                    <span class="hidden text-[11px] font-medium text-medi-gray sm:block">Mitarbeiter-Informationsportal</span>
                 </span>
             </a>
             <div class="ml-auto flex items-center gap-1">

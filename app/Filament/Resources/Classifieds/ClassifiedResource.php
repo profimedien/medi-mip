@@ -54,6 +54,7 @@ class ClassifiedResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->columns(1)->components([
+            Select::make('topic')->label('Kategorie')->options(fn () => array_combine(\App\Models\Classified::topics(), \App\Models\Classified::topics())),
             TextInput::make('title')->label('Titel')->required(),
             Textarea::make('body')->label('Text')->required(),
             DateTimePicker::make('expires_at')->label('Läuft bis')->required(),
@@ -66,6 +67,7 @@ class ClassifiedResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('title')->label('Titel')->searchable()->weight('medium'),
+                TextColumn::make('topic')->label('Kategorie')->badge()->color('info'),
                 TextColumn::make('category')->label('Rubrik')->badge()->formatStateUsing(fn ($state) => \App\Models\Classified::CATEGORIES[$state] ?? $state),
                 TextColumn::make('user.last_name')->label('Von')->formatStateUsing(fn ($record) => $record->user?->name),
                 TextColumn::make('expires_at')->label('Läuft bis')->date('d.m.Y')->sortable()->color(fn ($state) => $state?->isPast() ? 'danger' : null),

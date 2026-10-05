@@ -31,6 +31,6 @@ class InboxNotification extends Notification implements ShouldQueue
             $mail->action('Im Portal ansehen', $this->url);
         }
 
-        return $mail->salutation('Ihr MIP · Mitarbeiter Informationsportal');
+        return $mail->salutation('Ihr MIP · Mitarbeiter-Informationsportal');
     }
 }

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Post extends Model implements HasMedia
 {
@@ -38,6 +39,12 @@ class Post extends Model implements HasMedia
     {
         $this->addMediaCollection('attachments');
         $this->addMediaCollection('image')->singleFile();
+    }
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('card')->width(960)->height(540)->nonQueued()->performOnCollections('image');
+        $this->addMediaConversion('large')->width(1600)->nonQueued()->performOnCollections('image');
     }
 
     public function scopePublished(Builder $query): Builder

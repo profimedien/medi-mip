@@ -29,7 +29,7 @@
                 <a href="{{ route('news.index') }}" wire:navigate class="text-sm text-medi-sky">Alle News</a>
             </div>
             @forelse ($posts as $post)
-                @include('livewire.news.partials.card', ['post' => $post])
+                @include('livewire.news.partials.card', ['post' => $post, 'featured' => $loop->first])
             @empty
                 <p class="card text-sm">Noch keine Neuigkeiten.</p>
             @endforelse
@@ -38,14 +38,36 @@
         <div class="space-y-6">
             <section class="card">
                 <div class="mb-3 flex items-baseline justify-between">
-                    <h2 class="font-bold">Demnächst</h2>
+                    <h2 class="font-bold">Nächste Termine</h2>
                     <a href="{{ route('calendar') }}" wire:navigate class="text-sm text-medi-sky">Kalender</a>
                 </div>
-                @forelse ($upcoming as $entry)
-                    @include('livewire.partials.calendar-entry', ['entry' => $entry, 'compact' => true])
-                @empty
-                    <p class="text-sm">In den nächsten zwei Wochen steht nichts an.</p>
-                @endforelse
+                <div class="space-y-2">
+                    @forelse ($events as $event)
+                        <a href="{{ route('calendar', ['month' => $event->starts_at->format('Y-m')]) }}" wire:navigate class="flex items-center gap-3 rounded-xl p-2 transition hover:bg-medi-bg">
+                            <span class="grid w-14 shrink-0 place-items-center rounded-xl bg-medi-blue py-1.5 text-white">
+                                <span class="text-[10px] font-medium uppercase tracking-wide opacity-80">{{ $event->starts_at->translatedFormat('M') }}</span>
+                                <span class="text-xl font-bold leading-none">{{ $event->starts_at->format('d') }}</span>
+                            </span>
+                            <span class="min-w-0">
+                                <span class="block truncate font-medium text-medi-navy">{{ $event->title }}</span>
+                                <span class="block truncate text-xs">{{ $event->starts_at->translatedFormat('l') }}{{ $event->all_day ? '' : ', '.$event->starts_at->format('H:i').' Uhr' }}{{ $event->place ? ' · '.$event->place : '' }}</span>
+                            </span>
+                        </a>
+                    @empty
+                        <p class="text-sm">Aktuell sind keine Termine geplant.</p>
+                    @endforelse
+                </div>
+                @if ($today->isNotEmpty())
+                    <div class="mt-4 border-t border-black/5 pt-3">
+                        <p class="mb-2 text-xs font-medium uppercase tracking-wide text-medi-gray/70">Heute</p>
+                        @foreach ($today as $t)
+                            <p class="flex items-center gap-2 py-0.5 text-sm">
+                                <x-dynamic-component :component="'heroicon-o-'.($t['type'] === 'birthday' ? 'cake' : 'trophy')" @class(['size-4 shrink-0', 'text-orange-500' => $t['type'] === 'birthday', 'text-emerald-600' => $t['type'] !== 'birthday']) />
+                                {{ $t['title'] }}
+                            </p>
+                        @endforeach
+                    </div>
+                @endif
             </section>
 
             <section class="card">

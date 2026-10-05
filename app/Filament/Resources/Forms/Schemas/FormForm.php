@@ -28,9 +28,10 @@ class FormForm
                     TextInput::make('title')->label('Titel')->required()->maxLength(255),
                     RichEditor::make('description')->label('Beschreibung')
                         ->toolbarButtons([['bold', 'italic', 'link'], ['bulletList', 'orderedList'], ['undo', 'redo']]),
-                    CheckboxList::make('choices')->label('Antwortmöglichkeiten')
-                        ->options(Form::CHOICES)->columns(3)
-                        ->helperText('Leer lassen, wenn nur die Zusatzfragen beantwortet werden sollen.'),
+                    TagsInput::make('choices')->label('Antwortmöglichkeiten')
+                        ->default(Form::DEFAULT_CHOICES)->suggestions(Form::SUGGESTED_CHOICES)->reorderable()
+                        ->placeholder('Antwort eingeben und Enter drücken')
+                        ->helperText('Standard: Zusage und Absage. Frei änderbar, z. B. „Vielleicht“. Bei „Absage“ oder „Nein“ entfallen die Zusatzfragen. Leer lassen, wenn nur die Zusatzfragen beantwortet werden.'),
                     Toggle::make('requires_signature')->label('Unterschrift verlangen'),
                 ]),
                 Section::make('Zusatzfragen')
@@ -59,8 +60,11 @@ class FormForm
                 Section::make('Zeitraum')->schema([
                     DateTimePicker::make('published_at')->label('Veröffentlichen am')->default(now())->seconds(false),
                     DateTimePicker::make('deadline')->label('Frist')->seconds(false),
-                    Toggle::make('send_reminder')->label('Erinnerung vor Fristende')->default(true)
-                        ->helperText(config('mip.form_reminder_hours').' Stunden vor Fristende an alle, die noch nicht geantwortet haben.'),
+                    Toggle::make('send_reminder')->label('Erinnerung vor Fristende')->default(true)->live()
+                        ->helperText('Geht an alle, die noch nicht geantwortet haben.'),
+                    Select::make('reminder_hours')->label('Erinnern')->default(48)->required()
+                        ->options([4 => '4 Stunden vorher', 12 => '12 Stunden vorher', 24 => '1 Tag vorher', 48 => '2 Tage vorher (Standard)', 72 => '3 Tage vorher', 168 => '1 Woche vorher'])
+                        ->visible(fn (Get $get) => (bool) $get('send_reminder')),
                 ]),
                 Fields::audience(),
             ])->columnSpan(1),

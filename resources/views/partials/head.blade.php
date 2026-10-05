@@ -3,7 +3,7 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0032ba">
-<title>{{ $title ? $title.' · ' : '' }}MIP · Mitarbeiter Informationsportal</title>
+<title>{{ $title ? $title.' · ' : '' }}MIP · Mitarbeiter-Informationsportal</title>
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/images/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="/images/icon-180.png">

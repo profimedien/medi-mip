@@ -1,9 +1,14 @@
 <article class="mx-auto max-w-3xl space-y-4">
-    <a href="{{ route('news.index') }}" wire:navigate class="inline-flex items-center gap-1 text-sm text-medi-sky"><x-heroicon-o-arrow-left class="size-4" /> Alle News</a>
+    <div class="flex items-center justify-between">
+        <a href="{{ route('news.index') }}" wire:navigate class="inline-flex items-center gap-1 text-sm text-medi-sky"><x-heroicon-o-arrow-left class="size-4" /> Alle News</a>
+        @unless ($read?->confirmed_at)
+            <button wire:click="markUnread" class="inline-flex items-center gap-1 text-sm text-medi-gray hover:text-medi-blue"><x-heroicon-o-envelope class="size-4" /> Als ungelesen markieren</button>
+        @endunless
+    </div>
 
     <div class="card space-y-4">
         @if ($image)
-            <img src="{{ route('media.show', $image) }}" alt="" class="-mx-5 -mt-5 w-[calc(100%+2.5rem)] max-w-none rounded-t-2xl object-cover">
+            <img src="{{ route('media.show', [$image, 'large']) }}" alt="" class="-mx-5 -mt-5 w-[calc(100%+2.5rem)] max-w-none rounded-t-2xl object-cover">
         @endif
         <div class="flex flex-wrap items-center gap-2 text-xs">
             <span>{{ $post->published_at->translatedFormat('j. F Y') }}</span>

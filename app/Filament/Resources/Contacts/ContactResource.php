@@ -53,6 +53,9 @@ class ContactResource extends Resource
             Select::make('location_id')->label('Standort')->relationship('location', 'short_name')->placeholder('standortübergreifend'),
             TextInput::make('phone')->label('Telefon')->tel(),
             TextInput::make('email')->label('E-Mail')->email(),
+            TextInput::make('availability')->label('Erreichbarkeit')->placeholder('z. B. Mo bis Do 8 bis 12 Uhr'),
+            Fields::upload('photo', 'Foto', images: true),
+            Textarea::make('description')->label('Wofür ist die Person zuständig?')->rows(3)->columnSpanFull(),
         ]);
     }
 

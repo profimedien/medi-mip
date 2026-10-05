@@ -12,7 +12,7 @@ class FormResponseTest extends TestCase
 {
     private function form(array $attrs = []): Form
     {
-        $form = Form::create($attrs + ['title' => 'Sommerfest', 'choices' => ['zusage', 'absage'], 'audience_all' => true, 'published_at' => now()->subMinute(), 'deadline' => now()->addWeek()]);
+        $form = Form::create($attrs + ['title' => 'Sommerfest', 'choices' => ['Zusage', 'Absage', 'Vielleicht'], 'audience_all' => true, 'published_at' => now()->subMinute(), 'deadline' => now()->addWeek()]);
         $form->fields()->create(['type' => 'number', 'label' => 'Begleitpersonen', 'required' => true, 'sort' => 0]);
 
         return $form;
@@ -25,11 +25,11 @@ class FormResponseTest extends TestCase
         $field = $form->fields->first();
 
         Livewire::actingAs($user)->test(Show::class, ['form' => $form])
-            ->set('choice', 'zusage')->call('submit')->assertHasErrors('answers.'.$field->id)
+            ->set('choice', 'Zusage')->call('submit')->assertHasErrors('answers.'.$field->id)
             ->set('answers.'.$field->id, 2)->call('submit')->assertHasNoErrors();
 
         $r = FormResponse::where('form_id', $form->id)->where('user_id', $user->id)->first();
-        $this->assertSame('zusage', $r->choice);
+        $this->assertSame('Zusage', $r->choice);
         $this->assertEquals(2, $r->answers[$field->id]);
     }
 
@@ -37,16 +37,25 @@ class FormResponseTest extends TestCase
     {
         $form = $this->form();
         Livewire::actingAs($this->person())->test(Show::class, ['form' => $form])
-            ->set('choice', 'absage')->call('submit')->assertHasNoErrors();
+            ->set('choice', 'Absage')->call('submit')->assertHasNoErrors();
+    }
+
+    public function test_eigene_antwort_und_unbekannte_antwort(): void
+    {
+        $form = $this->form();
+        Livewire::actingAs($this->person())->test(Show::class, ['form' => $form])
+            ->set('choice', 'Gibt es nicht')->call('submit')->assertHasErrors('choice');
+        $this->assertTrue(Form::isDecline('Absage'));
+        $this->assertFalse(Form::isDecline('Vielleicht'));
     }
 
     public function test_unterschrift_ist_pflicht_wenn_verlangt(): void
     {
-        $form = Form::create(['title' => 'Hygiene', 'choices' => ['kenntnis'], 'requires_signature' => true, 'audience_all' => true, 'published_at' => now()->subMinute()]);
+        $form = Form::create(['title' => 'Hygiene', 'choices' => ['Zur Kenntnis genommen'], 'requires_signature' => true, 'audience_all' => true, 'published_at' => now()->subMinute()]);
         $png = 'data:image/png;base64,'.base64_encode(base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='));
 
         Livewire::actingAs($this->person())->test(Show::class, ['form' => $form])
-            ->call('submit')->assertHasErrors('signature')
+            ->set('choice', 'Zur Kenntnis genommen')->call('submit')->assertHasErrors('signature')
             ->set('signature', $png)->call('submit')->assertHasNoErrors();
         $this->assertNotNull(FormResponse::first()->signature_path);
     }

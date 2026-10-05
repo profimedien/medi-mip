@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Event;
 use App\Models\Form;
 use App\Models\Link;
 use App\Models\Post;
@@ -24,7 +25,9 @@ class Home extends Component
                 ->where(fn ($q) => $q->whereNull('deadline')->orWhere('deadline', '>', now()))
                 ->whereDoesntHave('responses', fn ($q) => $q->where('user_id', $user->id))
                 ->orderBy('deadline')->get(),
-            'upcoming' => app(CalendarFeed::class)->between($user, CarbonImmutable::today(), CarbonImmutable::today()->addDays(14), $user->location_id)->take(5),
+            'events' => Event::visibleTo($user)->where('starts_at', '>=', now()->startOfDay())->orderBy('starts_at')->limit(3)->get(),
+            'today' => app(CalendarFeed::class)->between($user, CarbonImmutable::today(), CarbonImmutable::today(), $user->location_id)
+                ->whereIn('type', ['birthday', 'anniversary'])->values(),
             'links' => Link::orderBy('sort')->get(),
         ]);
     }

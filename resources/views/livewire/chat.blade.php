@@ -3,8 +3,44 @@
     <aside @class(['card flex w-full flex-col p-0 md:w-80 md:shrink-0', 'hidden md:flex' => $group])>
         <div class="flex items-center justify-between border-b border-black/5 p-4">
             <h1 class="text-xl font-bold">Medigram</h1>
-            <button wire:click="$toggle('newChat')" class="rounded-lg p-1.5 text-medi-blue hover:bg-medi-bg" aria-label="Neuer Direktchat"><x-heroicon-o-pencil-square class="size-6" /></button>
+            <div class="flex items-center gap-1">
+                <button wire:click="$set('newGroup', false); $toggle('newChat')" class="rounded-lg p-1.5 text-medi-blue hover:bg-medi-bg" title="Neuer Direktchat" aria-label="Neuer Direktchat"><x-heroicon-o-pencil-square class="size-6" /></button>
+                <button wire:click="$set('newChat', false); $toggle('newGroup')" class="rounded-lg p-1.5 text-medi-blue hover:bg-medi-bg" title="Neue Gruppe" aria-label="Neue Gruppe"><x-heroicon-o-user-group class="size-6" /></button>
+            </div>
         </div>
+        @if ($newGroup)
+            <form wire:submit="createGroup" class="space-y-3 border-b border-black/5 bg-medi-bg/50 p-3">
+                <p class="text-sm font-bold text-medi-navy">Neue Gruppe</p>
+                <div>
+                    <input type="text" wire:model="groupName" class="input" placeholder="Name, z. B. Lauftreff Fürth">
+                    @error('groupName')<p class="mt-1 text-xs text-medi-red">{{ $message }}</p>@enderror
+                </div>
+                @if ($selectedMembers->isNotEmpty())
+                    <div class="flex flex-wrap gap-1.5">
+                        @foreach ($selectedMembers as $m)
+                            <span class="inline-flex items-center gap-1 rounded-full bg-medi-blue/10 py-0.5 pl-2.5 pr-1 text-xs font-medium text-medi-blue">
+                                {{ $m->name }}
+                                <button type="button" wire:click="removeMember({{ $m->id }})" class="rounded-full p-0.5 hover:bg-medi-blue/20" aria-label="Entfernen"><x-heroicon-o-x-mark class="size-3" /></button>
+                            </span>
+                        @endforeach
+                    </div>
+                @endif
+                <div>
+                    <input type="search" wire:model.live.debounce.300ms="memberSearch" class="input" placeholder="Personen hinzufügen">
+                    @foreach ($memberResults as $person)
+                        <button type="button" wire:click="addMember({{ $person->id }})" class="mt-1 flex w-full items-center gap-2 rounded-lg p-2 text-left text-sm hover:bg-white">
+                            <x-avatar :user="$person" class="size-7 text-[10px]" /> {{ $person->name }} <span class="text-xs">{{ $person->location?->label }}</span>
+                            <x-heroicon-o-plus class="ml-auto size-4 text-medi-blue" />
+                        </button>
+                    @endforeach
+                    @error('groupMembers')<p class="mt-1 text-xs text-medi-red">{{ $message }}</p>@enderror
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn flex-1">Gruppe erstellen</button>
+                    <button type="button" wire:click="$set('newGroup', false)" class="btn-ghost">Abbrechen</button>
+                </div>
+            </form>
+        @endif
         @if ($newChat)
             <div class="border-b border-black/5 p-3">
                 <input type="search" wire:model.live.debounce.300ms="personSearch" class="input" placeholder="Person suchen" autofocus>
@@ -45,6 +81,9 @@
                     <h2 class="truncate font-bold">{{ $group->titleFor(auth()->user()) }}</h2>
                     <p class="text-xs">{{ $group->type === 'direct' ? 'Direktchat' : $group->members->count().' Mitglieder' }}{{ $group->read_only ? ' · nur Moderation schreibt' : '' }}</p>
                 </div>
+                @if ($group->type === 'custom')
+                    <button wire:click="leaveGroup" wire:confirm="Gruppe wirklich verlassen?" class="ml-auto text-xs text-medi-red">Verlassen</button>
+                @endif
             </div>
 
             <div class="flex-1 space-y-3 overflow-y-auto p-4" wire:poll.5s x-data x-init="$el.scrollTop = $el.scrollHeight"

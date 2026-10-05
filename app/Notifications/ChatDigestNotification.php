@@ -32,6 +32,6 @@ class ChatDigestNotification extends Notification implements ShouldQueue
 
         return $mail->action('Zum Medigram', route('chat'))
             ->line('Diese Zusammenfassung können Sie in Ihrem Profil abschalten.')
-            ->salutation('Ihr MIP · Mitarbeiter Informationsportal');
+            ->salutation('Ihr MIP · Mitarbeiter-Informationsportal');
     }
 }

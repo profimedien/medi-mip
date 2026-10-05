@@ -25,6 +25,14 @@ class Show extends Component
             ->whereNull('confirmed_at')->update(['confirmed_at' => now()]);
     }
 
+    /** Zurück auf ungelesen (bestätigte Pflicht-Informationen bleiben bestätigt) */
+    public function markUnread()
+    {
+        PostRead::where('post_id', $this->post->id)->where('user_id', auth()->id())->whereNull('confirmed_at')->delete();
+
+        return $this->redirectRoute('news.index', navigate: true);
+    }
+
     public function render()
     {
         return view('livewire.news.show', [

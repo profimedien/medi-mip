@@ -14,11 +14,21 @@ class Form extends Model implements HasMedia
 {
     use HasAudience, InteractsWithMedia;
 
-    public const CHOICES = [
-        'zusage' => 'Zusage',
-        'absage' => 'Absage',
-        'kenntnis' => 'Zur Kenntnis genommen',
-    ];
+    /** Standard für neue Rückmeldungen, je Rückmeldung frei änderbar */
+    public const DEFAULT_CHOICES = ['Zusage', 'Absage'];
+
+    /** Vorschläge im Eingabefeld der Redaktion */
+    public const SUGGESTED_CHOICES = ['Zusage', 'Absage', 'Vielleicht', 'Zur Kenntnis genommen', 'Nehme online teil'];
+
+    /** Bei diesen Antworten entfallen die Zusatzfragen */
+    public const DECLINE_WORDS = ['absage', 'nein', 'kann nicht', 'nicht dabei'];
+
+    public static function isDecline(?string $choice): bool
+    {
+        $c = mb_strtolower(trim((string) $choice));
+
+        return $c !== '' && collect(self::DECLINE_WORDS)->contains(fn ($w) => str_contains($c, $w));
+    }
 
     protected $guarded = ['id'];
 
@@ -26,6 +36,7 @@ class Form extends Model implements HasMedia
         'choices' => 'array',
         'requires_signature' => 'boolean',
         'send_reminder' => 'boolean',
+        'reminder_hours' => 'integer',
         'deadline' => 'datetime',
         'reminder_sent_at' => 'datetime',
         'published_at' => 'datetime',
@@ -65,6 +76,6 @@ class Form extends Model implements HasMedia
 
     public function choiceOptions(): array
     {
-        return array_intersect_key(self::CHOICES, array_flip($this->choices ?? []));
+        return array_values($this->choices ?? []);
     }
 }

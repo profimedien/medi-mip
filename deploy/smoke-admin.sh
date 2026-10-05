@@ -15,7 +15,7 @@ for p in /admin /admin/users /admin/users/create /admin/users/1/edit /admin/post
          /admin/forms /admin/forms/create /admin/forms/1/edit /admin/events /admin/galleries /admin/chat-groups \
          /admin/faqs /admin/faq-categories /admin/faq-questions /admin/contacts /admin/org-units /admin/onboarding-sections \
          /admin/links /admin/suggestions /admin/material-requests /admin/referrals /admin/classifieds \
-         /admin/locations /admin/departments /admin/settings; do
+         /admin/locations /admin/departments /admin/settings /admin/organigramm; do
   OUT=$(curl -s --http1.1 -b "$JAR" -w "\n%{http_code}" "$BASE$p")
   STATUS=$(tail -1 <<< "$OUT")
   ERR=$(grep -o -m1 -E '(Internal Server Error|Exception)[^<"]{0,200}' <<< "$OUT")

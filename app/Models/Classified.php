@@ -17,6 +17,14 @@ class Classified extends Model implements HasMedia
 
     public const RUNTIME_DAYS = 30;
 
+    public const DEFAULT_TOPICS = "Verkaufen\nVerschenken\nSuche\nMitfahrgelegenheit\nWohnen\nTherapiematerial\nSonstiges";
+
+    /** Kategorien, von der Redaktion unter "Empfänger und Texte" pflegbar */
+    public static function topics(): array
+    {
+        return array_values(array_filter(array_map('trim', explode("\n", (string) Setting::get('classified_topics', self::DEFAULT_TOPICS)))));
+    }
+
     protected $guarded = ['id'];
 
     protected $casts = ['expires_at' => 'datetime', 'extended' => 'boolean'];

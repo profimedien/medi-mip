@@ -11,7 +11,6 @@ use App\Models\Event;
 use App\Models\Faq;
 use App\Models\FaqCategory;
 use App\Models\Form;
-use App\Models\Gallery;
 use App\Models\Location;
 use App\Models\OnboardingSection;
 use App\Models\OrgUnit;
@@ -33,7 +32,7 @@ class DemoContentSeeder extends Seeder
 
         // News
         $posts = [
-            ['Willkommen im MIP, Ihrem Mitarbeiter Informationsportal', 'Ab sofort finden Sie hier News, Termine, Ansprechpartner und vieles mehr an einem Ort.', true, false, ['audience_all' => true]],
+            ['Willkommen im MIP, Ihrem Mitarbeiter-Informationsportal', 'Ab sofort finden Sie hier News, Termine, Ansprechpartner und vieles mehr an einem Ort.', true, false, ['audience_all' => true]],
             ['Neue Hygieneregeln ab November', 'Bitte lesen und bestätigen: Die überarbeiteten Hygieneregeln gelten ab 01.11. an allen Standorten.', false, true, ['audience_all' => true]],
             ['Teambesprechung Physiotherapie', 'Die nächste Fachbereichsbesprechung findet online statt. Einladung folgt im Kalender.', false, false, ['audience_all' => false, 'audience_departments' => [$physio->id]]],
             ['Fürth: Neue Geräte im Trainingsbereich', 'Im Trainingsbereich stehen ab Montag zwei neue Geräte bereit. Einweisung jeweils dienstags.', false, false, ['audience_all' => false, 'audience_locations' => [$fuerth->id]]],
@@ -118,7 +117,7 @@ class DemoContentSeeder extends Seeder
         $sommerfest = Form::create([
             'title' => 'Sommerfest: Wer ist dabei?',
             'description' => '<p>Bitte geben Sie bis zur Frist Bescheid, ob Sie dabei sind.</p>',
-            'choices' => ['zusage', 'absage'], 'deadline' => now()->addDays(20), 'audience_all' => true,
+            'choices' => ['Zusage', 'Absage', 'Vielleicht'], 'deadline' => now()->addDays(20), 'audience_all' => true,
             'author_id' => $admin->id, 'published_at' => now()->subDay(), 'notified_at' => now()->subDay(),
         ]);
         $sommerfest->fields()->createMany([
@@ -129,7 +128,7 @@ class DemoContentSeeder extends Seeder
         Form::create([
             'title' => 'Hygieneregeln: Kenntnisnahme',
             'description' => '<p>Bitte bestätigen Sie mit Ihrer Unterschrift, dass Sie die neuen Hygieneregeln gelesen haben.</p>',
-            'choices' => ['kenntnis'], 'requires_signature' => true, 'deadline' => now()->addDays(14),
+            'choices' => ['Zur Kenntnis genommen'], 'requires_signature' => true, 'deadline' => now()->addDays(14),
             'audience_all' => true, 'author_id' => $admin->id, 'published_at' => now(), 'notified_at' => now(),
         ]);
 
@@ -137,17 +136,11 @@ class DemoContentSeeder extends Seeder
         $someone = User::where('username', 'demo.mitarbeiter')->first();
         Suggestion::create(['user_id' => $someone->id, 'topic' => 'Ausstattung', 'body' => 'Zweiter Wasserspender im Wartebereich wäre super.']);
         foreach ([
-            ['private', 'Kinderfahrrad 20 Zoll', 'Gut erhalten, Abholung in Ansbach.', '40 €'],
-            ['private', 'Mitfahrgelegenheit Nürnberg–Fürth', 'Fahre Mo bis Fr gegen 7 Uhr, zwei Plätze frei.', null],
-            ['business', 'Therapiebänder abzugeben', 'Restbestand aus Neuendettelsau, gerne an andere Standorte.', null],
-        ] as [$cat, $title, $body, $price]) {
-            Classified::create(['user_id' => $someone->id, 'category' => $cat, 'title' => $title, 'body' => $body, 'price' => $price, 'expires_at' => now()->addDays(Classified::RUNTIME_DAYS)]);
-        }
-
-        // Galerie mit erzeugten Platzhalterbildern
-        $gallery = Gallery::create(['title' => 'Eröffnung Fürth', 'description' => 'Platzhalterbilder für den Prototyp.', 'event_date' => now()->subMonths(2), 'audience_all' => true]);
-        foreach ([[0, 50, 186], [30, 136, 210], [0, 61, 143], [224, 0, 58]] as $i => $rgb) {
-            $gallery->addMedia($this->placeholderImage($rgb, 'Foto '.($i + 1)))->toMediaCollection('photos');
+            ['private', 'Kinderfahrrad 20 Zoll', 'Gut erhalten, Abholung in Ansbach.', '40 €', 'Verkaufen'],
+            ['private', 'Mitfahrgelegenheit Nürnberg nach Fürth', 'Fahre Mo bis Fr gegen 7 Uhr, zwei Plätze frei.', null, 'Mitfahrgelegenheit'],
+            ['business', 'Therapiebänder abzugeben', 'Restbestand aus Neuendettelsau, gerne an andere Standorte.', null, 'Therapiematerial'],
+        ] as [$cat, $title, $body, $price, $topic]) {
+            Classified::create(['user_id' => $someone->id, 'category' => $cat, 'topic' => $topic, 'title' => $title, 'body' => $body, 'price' => $price, 'expires_at' => now()->addDays(Classified::RUNTIME_DAYS)]);
         }
 
         // Chatgruppen anlegen und mit Beispielnachrichten füllen
@@ -166,17 +159,5 @@ class DemoContentSeeder extends Seeder
     {
         $msg = ChatMessage::create(['chat_group_id' => $group->id, 'user_id' => $user->id, 'body' => $body]);
         $group->update(['last_message_at' => $msg->created_at]);
-    }
-
-    private function placeholderImage(array $rgb, string $label): string
-    {
-        $img = imagecreatetruecolor(1200, 800);
-        imagefill($img, 0, 0, imagecolorallocate($img, ...$rgb));
-        imagestring($img, 5, 560, 390, $label, imagecolorallocate($img, 255, 255, 255));
-        $path = tempnam(sys_get_temp_dir(), 'mip').'.jpg';
-        imagejpeg($img, $path, 85);
-        imagedestroy($img);
-
-        return $path;
     }
 }

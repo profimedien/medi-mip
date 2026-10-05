@@ -29,7 +29,7 @@ class Settings extends Page
 
     public ?array $data = [];
 
-    public const KEYS = ['suggestion_topics', 'suggestion_recipients', 'material_recipients', 'referral_recipients', 'faq_recipients', 'referral_text'];
+    public const KEYS = ['classified_topics', 'suggestion_topics', 'suggestion_recipients', 'material_recipients', 'referral_recipients', 'faq_recipients', 'referral_text'];
 
     public static function canAccess(): bool
     {
@@ -38,7 +38,8 @@ class Settings extends Page
 
     public function mount(): void
     {
-        $this->form->fill(collect(self::KEYS)->mapWithKeys(fn ($k) => [$k => Setting::get($k)])->all());
+        $this->form->fill(collect(self::KEYS)->mapWithKeys(fn ($k) => [$k => Setting::get($k)])->all()
+            + ['classified_topics' => Setting::get('classified_topics', \App\Models\Classified::DEFAULT_TOPICS)]);
     }
 
     public function form(Schema $schema): Schema
@@ -55,6 +56,10 @@ class Settings extends Page
                 TextInput::make('faq_recipients')->label('Eingereichte FAQ-Fragen')->helperText($hint),
                 TextInput::make('referral_recipients')->label('Mitarbeiter werben Mitarbeiter')->helperText($hint),
             ])->columns(3),
+            Section::make('Kleinanzeigen')->schema([
+                Textarea::make('classified_topics')->label('Kategorien (eine pro Zeile)')->rows(7)
+                    ->helperText('Bestehende Anzeigen behalten ihre Kategorie, auch wenn sie hier entfernt wird.'),
+            ]),
             Section::make('Mitarbeiter werben Mitarbeiter')->schema([
                 Textarea::make('referral_text')->label('Text zu Prämie und Bedingungen')->rows(5),
             ]),

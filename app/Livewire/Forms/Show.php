@@ -46,10 +46,10 @@ class Show extends Component
 
         $rules = [];
         if ($this->form->choices) {
-            $rules['choice'] = ['required', 'in:'.implode(',', $this->form->choices)];
+            $rules['choice'] = ['required', \Illuminate\Validation\Rule::in($this->form->choices)];
         }
         // Zusatzfragen nur bei Zusage bzw. wenn es keine Zu-/Absage gibt
-        $needsFields = ! $this->form->choices || $this->choice !== 'absage';
+        $needsFields = ! $this->form->choices || ! Form::isDecline($this->choice);
         foreach ($this->form->fields as $field) {
             $key = 'answers.'.$field->id;
             $rules[$key] = match ($field->type) {

@@ -31,8 +31,8 @@ class ResponsesRelationManager extends RelationManager
                     ->formatStateUsing(fn (FormResponse $r) => $r->user?->name)->searchable(['first_name', 'last_name']),
                 TextColumn::make('user.location.short_name')->label('Standort'),
                 TextColumn::make('choice')->label('Antwort')->badge()
-                    ->formatStateUsing(fn (?string $state) => Form::CHOICES[$state] ?? $state)
-                    ->color(fn (?string $state) => match ($state) { 'zusage' => 'success', 'absage' => 'danger', default => 'gray' }),
+                    
+                    ->color(fn (?string $state) => Form::isDecline($state) ? 'danger' : (mb_strtolower((string) $state) === 'zusage' ? 'success' : 'gray')),
             ], $form->fields->map(fn ($field) => TextColumn::make('answer_'.$field->id)->label($field->label)
                 ->state(function (FormResponse $r) use ($field) {
                     $a = $r->answers[$field->id] ?? null;
@@ -43,7 +43,7 @@ class ResponsesRelationManager extends RelationManager
                     ->state(fn (FormResponse $r) => filled($r->signature_path)),
                 TextColumn::make('updated_at')->label('Am')->dateTime('d.m. H:i')->sortable(),
             ]))
-            ->filters([SelectFilter::make('choice')->label('Antwort')->options(Form::CHOICES)])
+            ->filters([SelectFilter::make('choice')->label('Antwort')->options(fn () => array_combine($form->choices ?? [], $form->choices ?? []))])
             ->headerActions([
                 Action::make('export')->label('Als Excel herunterladen')->icon('heroicon-o-arrow-down-tray')
                     ->action(fn () => (new FormResponsesExport($form))->download()),

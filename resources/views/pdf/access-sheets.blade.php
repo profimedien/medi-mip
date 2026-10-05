@@ -22,7 +22,7 @@
 @foreach ($sheets as $s)
     <div class="sheet{{ $loop->even && ! $loop->last ? ' break' : '' }}">
         <img class="qr" src="{{ $s['qr'] }}" alt="">
-        <h1>Ihr Zugang zum MIP · Mitarbeiter Informationsportal</h1>
+        <h1>Ihr Zugang zum MIP · Mitarbeiter-Informationsportal</h1>
         <p class="sub">für {{ $s['user']->name }}{{ $s['user']->location ? ' · '.$s['user']->location->label : '' }}</p>
         <div class="row"><div class="k">Benutzername</div><div class="v">{{ $s['user']->username }}</div></div>
         <div class="row"><div class="k">Startcode (nur für die erste Anmeldung)</div><div class="v">{{ $s['code'] }}</div></div>

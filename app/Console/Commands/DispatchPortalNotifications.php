@@ -42,9 +42,11 @@ class DispatchPortalNotifications extends Command
             $this->info("Rückmeldung {$form->id}: {$recipients->count()} Empfänger");
         }
 
-        $soon = now()->addHours(config('mip.form_reminder_hours'));
-        foreach (Form::published()->where('send_reminder', true)->whereNull('reminder_sent_at')
-            ->whereNotNull('deadline')->whereBetween('deadline', [now(), $soon])->get() as $form) {
+        // Erinnerung je Rückmeldung: reminder_hours vor Fristende (Standard 48)
+        $candidates = Form::published()->where('send_reminder', true)->whereNull('reminder_sent_at')
+            ->whereNotNull('deadline')->where('deadline', '>', now())->get()
+            ->filter(fn (Form $f) => $f->deadline->lte(now()->addHours($f->reminder_hours ?: config('mip.form_reminder_hours'))));
+        foreach ($candidates as $form) {
             $form->update(['reminder_sent_at' => now()]);
             $recipients = $form->audienceMembers()->whereDoesntHave('formResponses', fn ($q) => $q->where('form_id', $form->id))->get();
             Notification::send($recipients, new PortalNotification(

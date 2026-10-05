@@ -43,6 +43,7 @@ Route::middleware(['auth', 'account.ready'])->group(function () {
     Route::get('/kalender', Livewire\Calendar::class)->name('calendar');
     Route::get('/faq', Livewire\FaqPage::class)->name('faq');
     Route::get('/ansprechpartner', Livewire\Contacts::class)->name('contacts');
+    Route::get('/ansprechpartner/{contact}', Livewire\ContactShow::class)->name('contacts.show');
     Route::get('/galerien', Livewire\Galleries\Index::class)->name('galleries.index');
     Route::get('/galerien/{gallery}', Livewire\Galleries\Show::class)->name('galleries.show');
     Route::get('/organigramm', Livewire\OrgChart::class)->name('orgchart');
@@ -51,6 +52,7 @@ Route::middleware(['auth', 'account.ready'])->group(function () {
     Route::get('/rueckmeldungen/{form}', Livewire\Forms\Show::class)->name('forms.show');
     Route::get('/mitmachen', Livewire\Participation::class)->name('participation');
     Route::get('/kleinanzeigen', Livewire\Classifieds::class)->name('classifieds');
+    Route::get('/kleinanzeigen/{classified}', Livewire\Classifieds\Show::class)->name('classifieds.show');
     Route::get('/verzeichnis', Livewire\Directory\Index::class)->name('directory.index');
     Route::get('/verzeichnis/{user}', Livewire\Directory\Show::class)->name('directory.show');
     Route::get('/medigram/{group?}', Livewire\Chat::class)->name('chat');

@@ -26,7 +26,7 @@
                     <span class="grid size-10 shrink-0 place-items-center rounded-xl bg-emerald-50 text-emerald-700"><x-heroicon-o-check-circle class="size-5" /></span>
                     <span class="min-w-0">
                         <span class="block font-medium text-medi-navy">{{ $form->title }}</span>
-                        <span class="text-xs">{{ $r ? 'Ihre Antwort: '.(\App\Models\Form::CHOICES[$r->choice] ?? 'abgegeben').' am '.$r->updated_at->format('d.m.Y') : 'Frist abgelaufen' }}</span>
+                        <span class="text-xs">{{ $r ? 'Ihre Antwort: '.($r->choice ?: 'abgegeben').' am '.$r->updated_at->format('d.m.Y') : 'Frist abgelaufen' }}</span>
                     </span>
                 </a>
             @endforeach
