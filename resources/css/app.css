@@ -2,8 +2,61 @@
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+@source '../../app/Livewire/**/*.php';
+@source inline('border-medi-blue border-emerald-600 border-orange-500');
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Ubuntu', ui-sans-serif, system-ui, sans-serif;
+
+    /* medi-Farben aus Logo und Website */
+    --color-medi-blue: #0032ba;
+    --color-medi-navy: #003d8f;
+    --color-medi-sky: #1e88d2;
+    --color-medi-red: #e0003a;
+    --color-medi-gray: #485057;
+    --color-medi-bg: #f4f6fa;
+}
+
+@layer base {
+    body {
+        @apply bg-medi-bg text-medi-gray antialiased;
+    }
+    h1, h2, h3 {
+        @apply text-medi-navy;
+        text-wrap: balance;
+    }
+    p {
+        text-wrap: pretty;
+    }
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+@layer components {
+    .card {
+        @apply rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5;
+    }
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl bg-medi-blue px-4 py-2.5 text-sm font-medium text-white transition hover:bg-medi-navy disabled:opacity-50;
+    }
+    .btn-ghost {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-medi-blue ring-1 ring-medi-blue/30 transition hover:bg-medi-blue/5;
+    }
+    .input {
+        @apply w-full rounded-xl border-0 bg-white px-3.5 py-2.5 text-sm text-medi-gray ring-1 ring-black/10 focus:ring-2 focus:ring-medi-sky focus:outline-none;
+    }
+    .label {
+        @apply mb-1.5 block text-sm font-medium text-medi-gray;
+    }
+    .badge {
+        @apply inline-flex items-center rounded-full bg-medi-blue/10 px-2.5 py-0.5 text-xs font-medium text-medi-blue;
+    }
+    .prose-medi p { @apply mb-3; }
+    .prose-medi ul { @apply mb-3 list-disc pl-5; }
+    .prose-medi ol { @apply mb-3 list-decimal pl-5; }
+    .prose-medi a { @apply text-medi-sky underline; }
+    .prose-medi h2 { @apply mt-5 mb-2 text-lg font-bold; }
+    .prose-medi h3 { @apply mt-4 mb-2 font-bold; }
 }

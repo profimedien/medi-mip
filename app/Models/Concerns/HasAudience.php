@@ -38,7 +38,8 @@ trait HasAudience
     }
 
     /** JSON-Liste immer als Integer speichern, damit JSON_CONTAINS zuverlässig greift */
-    private function intList(string $column): Attribute
+    // bewusst ohne Rückgabetyp: sonst hält Laravel die Methode für einen Accessor "int_list"
+    private function intList(string $column)
     {
         return Attribute::make(
             get: fn ($value) => array_values(array_map('intval', json_decode($value ?? '[]', true) ?: [])),

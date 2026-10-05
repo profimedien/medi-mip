@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Filament\Resources\Contacts\Pages;
+
+use App\Filament\Resources\Contacts\ContactResource;
+use App\Filament\Support\Fields;
+use Filament\Actions\CreateAction;
+use Filament\Resources\Pages\ManageRecords;
+
+class ManageContacts extends ManageRecords
+{
+    protected static string $resource = ContactResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [CreateAction::make()];
+    }
+}

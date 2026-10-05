@@ -68,6 +68,11 @@ class User extends Authenticatable implements FilamentUser, HasMedia, HasName
         return $this->hasMany(PostRead::class);
     }
 
+    public function formResponses(): HasMany
+    {
+        return $this->hasMany(FormResponse::class);
+    }
+
     public function chatMemberships(): HasMany
     {
         return $this->hasMany(ChatMember::class);

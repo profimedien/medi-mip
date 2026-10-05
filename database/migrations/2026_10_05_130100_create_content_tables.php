@@ -97,6 +97,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->date('event_date')->nullable();
             $this->audience($table);
+            $table->foreignId('author_id')->nullable()->constrained('users')->nullOnDelete();
             $table->boolean('published')->default(true);
             $table->timestamps();
         });
