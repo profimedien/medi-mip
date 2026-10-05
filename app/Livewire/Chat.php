@@ -37,6 +37,10 @@ class Chat extends Component
 
     public string $memberSearch = '';
 
+    public bool $renaming = false;
+
+    public string $newName = '';
+
     public int $limit = 50;
 
     public function mount(?ChatGroup $group = null): void
@@ -87,6 +91,47 @@ class Chat extends Component
         $this->reset('body', 'upload');
         $this->markRead();
         $this->dispatch('chat-sent');
+    }
+
+    public function openNewChat(): void
+    {
+        $this->newGroup = false;
+        $this->newChat = ! $this->newChat;
+    }
+
+    public function openNewGroup(): void
+    {
+        $this->newChat = false;
+        $this->newGroup = ! $this->newGroup;
+        $this->resetErrorBag();
+    }
+
+    public function startRename(): void
+    {
+        abort_unless($this->canRename(), 403);
+        $this->newName = (string) $this->group->name;
+        $this->renaming = true;
+    }
+
+    /** Eigene Gruppen: Moderation oder Gesamt-Admin darf umbenennen */
+    public function rename(): void
+    {
+        abort_unless($this->canRename(), 403);
+        $this->validate(['newName' => ['required', 'string', 'min:3', 'max:60']], [], ['newName' => 'Gruppenname']);
+        $old = $this->group->name;
+        $this->group->update(['name' => $this->newName]);
+        ChatMessage::create(['chat_group_id' => $this->group->id, 'user_id' => auth()->id(),
+            'body' => auth()->user()->first_name.' hat die Gruppe von „'.$old.'“ in „'.$this->newName.'“ umbenannt.']);
+        $this->group->update(['last_message_at' => now()]);
+        $this->renaming = false;
+    }
+
+    private function canRename(): bool
+    {
+        $user = auth()->user();
+
+        return $this->group && $this->group->type === 'custom'
+            && ($this->group->membership($user)?->is_moderator || $user->isGesamtAdmin());
     }
 
     public function addMember(int $id): void
@@ -173,6 +218,7 @@ class Chat extends Component
             'messages' => $messages,
             'people' => $people,
             'canWrite' => $this->group?->canWrite($user) ?? false,
+            'canRename' => $this->canRename(),
             'isModerator' => $this->group ? ($this->group->membership($user)?->is_moderator || $user->isGesamtAdmin()) : false,
         ]);
     }

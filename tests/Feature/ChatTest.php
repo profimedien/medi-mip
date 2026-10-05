@@ -48,6 +48,28 @@ class ChatTest extends TestCase
         $this->assertSame(0, $group->fresh()->unreadCountFor($a));
     }
 
+    public function test_mitarbeiter_legt_gruppe_an_und_benennt_sie_um(): void
+    {
+        $a = $this->person();
+        $b = $this->person();
+        $other = $this->person();
+
+        Livewire::actingAs($a)->test(Chat::class)
+            ->call('openNewGroup')->assertSet('newGroup', true)
+            ->set('groupName', 'Lauftreff')->call('addMember', $b->id)->call('createGroup')->assertHasNoErrors();
+
+        $group = ChatGroup::where('name', 'Lauftreff')->firstOrFail();
+        $this->assertSame('custom', $group->type);
+        $this->assertTrue($group->membership($a)->is_moderator);
+        $this->assertFalse($group->membership($b)->is_moderator);
+
+        Livewire::actingAs($b)->test(Chat::class, ['group' => $group])->call('startRename')->assertForbidden();
+        Livewire::actingAs($a)->test(Chat::class, ['group' => $group])
+            ->call('startRename')->set('newName', 'Lauftreff Fürth')->call('rename')->assertHasNoErrors();
+        $this->assertSame('Lauftreff Fürth', $group->fresh()->name);
+        $this->assertNull($group->fresh()->membership($other));
+    }
+
     public function test_fremde_gruppe_ist_gesperrt(): void
     {
         $group = ChatGroup::directBetween($this->person(), $this->person());

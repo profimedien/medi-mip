@@ -4,8 +4,8 @@
         <div class="flex items-center justify-between border-b border-black/5 p-4">
             <h1 class="text-xl font-bold">Medigram</h1>
             <div class="flex items-center gap-1">
-                <button wire:click="$set('newGroup', false); $toggle('newChat')" class="rounded-lg p-1.5 text-medi-blue hover:bg-medi-bg" title="Neuer Direktchat" aria-label="Neuer Direktchat"><x-heroicon-o-pencil-square class="size-6" /></button>
-                <button wire:click="$set('newChat', false); $toggle('newGroup')" class="rounded-lg p-1.5 text-medi-blue hover:bg-medi-bg" title="Neue Gruppe" aria-label="Neue Gruppe"><x-heroicon-o-user-group class="size-6" /></button>
+                <button wire:click="openNewChat" class="rounded-lg p-1.5 text-medi-blue hover:bg-medi-bg" title="Neuer Direktchat" aria-label="Neuer Direktchat"><x-heroicon-o-pencil-square class="size-6" /></button>
+                <button wire:click="openNewGroup" class="rounded-lg p-1.5 text-medi-blue hover:bg-medi-bg" title="Neue Gruppe" aria-label="Neue Gruppe"><x-heroicon-o-user-group class="size-6" /></button>
             </div>
         </div>
         @if ($newGroup)
@@ -77,8 +77,22 @@
         @if ($group)
             <div class="flex items-center gap-3 border-b border-black/5 p-4">
                 <a href="{{ route('chat') }}" wire:navigate class="md:hidden" aria-label="Zurück"><x-heroicon-o-arrow-left class="size-5" /></a>
-                <div class="min-w-0">
-                    <h2 class="truncate font-bold">{{ $group->titleFor(auth()->user()) }}</h2>
+                <div class="min-w-0 flex-1">
+                    @if ($renaming)
+                        <form wire:submit="rename" class="flex items-center gap-2">
+                            <input type="text" wire:model="newName" class="input py-1.5" autofocus>
+                            <button class="btn py-1.5">Speichern</button>
+                            <button type="button" wire:click="$set('renaming', false)" class="text-sm text-medi-gray">Abbrechen</button>
+                        </form>
+                        @error('newName')<p class="mt-1 text-xs text-medi-red">{{ $message }}</p>@enderror
+                    @else
+                        <h2 class="flex items-center gap-2 truncate font-bold">
+                            {{ $group->titleFor(auth()->user()) }}
+                            @if ($canRename)
+                                <button wire:click="startRename" class="rounded-lg p-1 text-medi-gray hover:bg-medi-bg hover:text-medi-blue" title="Gruppe umbenennen"><x-heroicon-o-pencil class="size-4" /></button>
+                            @endif
+                        </h2>
+                    @endif
                     <p class="text-xs">{{ $group->type === 'direct' ? 'Direktchat' : $group->members->count().' Mitglieder' }}{{ $group->read_only ? ' · nur Moderation schreibt' : '' }}</p>
                 </div>
                 @if ($group->type === 'custom')
