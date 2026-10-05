@@ -5,7 +5,7 @@
 <style>
     @page { margin: 14mm; }
     body { font-family: DejaVu Sans, sans-serif; color: #485057; font-size: 10.5pt; }
-    .sheet { height: 128mm; border: 1px dashed #b4b4b4; border-radius: 4mm; padding: 9mm 10mm; margin-bottom: 6mm; page-break-inside: avoid; position: relative; }
+    .sheet { height: 110mm; border: 1px dashed #b4b4b4; border-radius: 4mm; padding: 9mm 10mm; margin-bottom: 6mm; page-break-inside: avoid; position: relative; }
     .sheet:nth-child(2n) { page-break-after: always; }
     h1 { color: #003d8f; font-size: 15pt; margin: 0 0 1mm; }
     .sub { margin: 0 0 6mm; }
