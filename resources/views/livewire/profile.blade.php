@@ -55,17 +55,18 @@
                 </div>
             </form>
         @else
-            <p class="text-sm">Für Ihr Konto ist keine E-Mail-Adresse hinterlegt. Neuigkeiten sehen Sie direkt im Portal oder per Push-Mitteilung.</p>
+            <p class="text-sm">Für Ihr Konto ist keine E-Mail-Adresse hinterlegt. Neuigkeiten sehen Sie direkt im Portal oder als Mitteilung auf Ihrem Handy (siehe unten).</p>
         @endif
 
         <div class="border-t border-black/5 pt-4" x-data="{ state: 'loading', async init() { this.state = await window.mipPush.status() } }">
-            <p class="mb-2 text-sm font-medium text-medi-navy">Push-Mitteilungen auf diesem Gerät</p>
+            <p class="text-sm font-medium text-medi-navy">Mitteilungen auf diesem Gerät</p>
+            <p class="mb-2 text-xs">Kurze Hinweise auf dem Bildschirm Ihres Handys oder Computers, auch wenn das Portal gerade geschlossen ist.</p>
             <template x-if="state === 'unsupported'">
-                <p class="text-sm">Dieses Gerät oder dieser Browser unterstützt keine Push-Mitteilungen. Auf dem iPhone funktioniert Push erst, wenn das Portal zum Home-Bildschirm hinzugefügt wurde.</p>
+                <p class="text-sm">Dieses Gerät oder dieser Browser unterstützt keine Push-Mitteilungen. Auf dem iPhone funktionieren Mitteilungen erst, wenn das Portal zum Home-Bildschirm hinzugefügt wurde.</p>
             </template>
             <template x-if="state === 'off' || state === 'denied'">
                 <div>
-                    <button type="button" class="btn" @click="state = await window.mipPush.enable(@js($vapid))" @disabled(! $vapid)>Push-Mitteilungen aktivieren</button>
+                    <button type="button" class="btn" @click="state = await window.mipPush.enable(@js($vapid))" @disabled(! $vapid)>Mitteilungen aktivieren</button>
                     <p x-show="state === 'denied'" class="mt-2 text-sm text-medi-red">Mitteilungen wurden im Browser abgelehnt. Bitte in den Geräteeinstellungen erlauben.</p>
                 </div>
             </template>
@@ -82,7 +83,7 @@
         <h2 class="font-bold">Passwort ändern</h2>
         <div class="grid gap-4 sm:grid-cols-3">
             <div><label class="label">Aktuelles Passwort</label><input type="password" wire:model="current_password" class="input" autocomplete="current-password">@error('current_password')<p class="mt-1 text-sm text-medi-red">{{ $message }}</p>@enderror</div>
-            <div><label class="label">Neues Passwort</label><input type="password" wire:model="password" class="input" autocomplete="new-password">@error('password')<p class="mt-1 text-sm text-medi-red">{{ $message }}</p>@enderror</div>
+            <div><label class="label">Neues Passwort (mindestens 8 Zeichen)</label><input type="password" wire:model="password" class="input" autocomplete="new-password">@error('password')<p class="mt-1 text-sm text-medi-red">{{ $message }}</p>@enderror</div>
             <div><label class="label">Wiederholen</label><input type="password" wire:model="password_confirmation" class="input" autocomplete="new-password"></div>
         </div>
         <div class="flex items-center gap-3">

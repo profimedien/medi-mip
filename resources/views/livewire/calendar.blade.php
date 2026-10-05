@@ -20,7 +20,7 @@
             @endforeach
         </select>
     </div>
-    <p class="text-xs">Termine gelten je nach Zielgruppe. Geburtstage und Jubiläen zeigen wir nur für den gewählten Standort.</p>
+    <p class="text-xs">Manche Termine betreffen nur bestimmte Standorte oder Abteilungen. Geburtstage und Jubiläen zeigen wir nur für den gewählten Standort.</p>
 
     <div class="card divide-y divide-black/5 py-2">
         @forelse ($days as $day => $entries)

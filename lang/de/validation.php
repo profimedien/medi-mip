@@ -1,0 +1,58 @@
+<?php
+
+// Deutsche Fehlermeldungen für die im Portal genutzten Prüfregeln
+return [
+    'accepted' => ':Attribute muss bestätigt werden.',
+    'after_or_equal' => ':Attribute darf nicht in der Vergangenheit liegen.',
+    'array' => ':Attribute ist ungültig.',
+    'boolean' => ':Attribute ist ungültig.',
+    'confirmed' => 'Die Wiederholung von :attribute stimmt nicht überein.',
+    'current_password' => 'Das aktuelle Passwort ist falsch.',
+    'date' => ':Attribute ist kein gültiges Datum.',
+    'email' => ':Attribute muss eine gültige E-Mail-Adresse sein.',
+    'exists' => 'Die Auswahl für :attribute ist ungültig.',
+    'file' => ':Attribute muss eine Datei sein.',
+    'image' => ':Attribute muss ein Bild sein (JPG, PNG oder WebP).',
+    'in' => 'Die Auswahl für :attribute ist ungültig.',
+    'integer' => ':Attribute muss eine ganze Zahl sein.',
+    'max' => [
+        'array' => ':Attribute darf höchstens :max Einträge haben.',
+        'file' => ':Attribute darf höchstens :max KB groß sein.',
+        'numeric' => ':Attribute darf höchstens :max sein.',
+        'string' => ':Attribute darf höchstens :max Zeichen lang sein.',
+    ],
+    'mimes' => ':Attribute muss vom Typ :values sein.',
+    'min' => [
+        'array' => ':Attribute braucht mindestens :min Einträge.',
+        'file' => ':Attribute muss mindestens :min KB groß sein.',
+        'numeric' => ':Attribute muss mindestens :min sein.',
+        'string' => ':Attribute muss mindestens :min Zeichen lang sein.',
+    ],
+    'numeric' => ':Attribute muss eine Zahl sein.',
+    'password' => [
+        'letters' => ':Attribute muss mindestens einen Buchstaben enthalten.',
+        'mixed' => ':Attribute muss Groß- und Kleinbuchstaben enthalten.',
+        'numbers' => ':Attribute muss mindestens eine Zahl enthalten.',
+        'symbols' => ':Attribute muss mindestens ein Sonderzeichen enthalten.',
+        'uncompromised' => ':Attribute ist aus einem Datenleck bekannt. Bitte ein anderes wählen.',
+    ],
+    'regex' => ':Attribute hat ein ungültiges Format.',
+    'required' => 'Bitte :attribute ausfüllen.',
+    'required_without' => 'Bitte :attribute ausfüllen.',
+    'starts_with' => ':Attribute ist ungültig.',
+    'string' => ':Attribute muss ein Text sein.',
+    'unique' => ':Attribute ist bereits vergeben.',
+    'uploaded' => ':Attribute konnte nicht hochgeladen werden.',
+    'url' => ':Attribute muss eine gültige Adresse sein.',
+
+    'attributes' => [
+        'password' => 'Passwort',
+        'login' => 'Benutzername',
+        'email' => 'E-Mail-Adresse',
+        'body' => 'Nachricht',
+        'upload' => 'Datei',
+        'question' => 'Frage',
+        'choice' => 'Antwort',
+        'signature' => 'Unterschrift',
+    ],
+];

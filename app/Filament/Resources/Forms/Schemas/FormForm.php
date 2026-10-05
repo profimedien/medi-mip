@@ -60,7 +60,7 @@ class FormForm
                     DateTimePicker::make('published_at')->label('Veröffentlichen am')->default(now())->seconds(false),
                     DateTimePicker::make('deadline')->label('Frist')->seconds(false),
                     Toggle::make('send_reminder')->label('Erinnerung vor Fristende')->default(true)
-                        ->helperText('Zwei Tage vor Fristende an alle, die noch nicht geantwortet haben.'),
+                        ->helperText(config('mip.form_reminder_hours').' Stunden vor Fristende an alle, die noch nicht geantwortet haben.'),
                 ]),
                 Fields::audience(),
             ])->columnSpan(1),
