@@ -19,6 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Redaktion: deutsche Datumsformate statt Browser-Format
+        \Filament\Forms\Components\DateTimePicker::configureUsing(fn ($c) => $c->native(false)->displayFormat('d.m.Y H:i')->firstDayOfWeek(1)->seconds(false));
+        \Filament\Forms\Components\DatePicker::configureUsing(fn ($c) => $c->native(false)->displayFormat('d.m.Y')->firstDayOfWeek(1));
         //
     }
 }

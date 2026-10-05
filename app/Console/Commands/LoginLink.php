@@ -10,7 +10,7 @@ class LoginLink extends Command
 {
     protected $signature = 'mip:login-link {username} {--minutes=10}';
 
-    protected $description = 'Signierten Einmal-Login für Tests erzeugen (nur Testsystem)';
+    protected $description = 'Signierten, zeitlich begrenzten Test-Login erzeugen (nur Testsystem)';
 
     public function handle(): int
     {

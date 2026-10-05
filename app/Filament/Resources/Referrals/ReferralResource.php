@@ -44,7 +44,7 @@ class ReferralResource extends Resource
 
     protected static ?string $modelLabel = 'Empfehlung';
 
-    protected static ?string $pluralModelLabel = 'Mitarbeiter werben';
+    protected static ?string $pluralModelLabel = 'Empfehlungen';
 
     public static function canCreate(): bool
     {

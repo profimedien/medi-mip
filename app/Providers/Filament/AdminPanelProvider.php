@@ -32,9 +32,10 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogoHeight('2.5rem')
             ->favicon(asset('images/icon-192.png'))
             ->colors([
-                'primary' => Color::hex('#0032ba'),
-                'danger' => Color::hex('#e0003a'),
-                'info' => Color::hex('#1e88d2'),
+                // V3-Palette: die Markenfarbe liegt auf Stufe 500, Buttons bekommen Stufe 600 mit weißer Schrift
+                'primary' => Color::generateV3Palette('#0032ba'),
+                'danger' => Color::generateV3Palette('#e0003a'),
+                'info' => Color::generateV3Palette('#1e88d2'),
             ])
             ->font('Ubuntu')
             ->navigationGroups([

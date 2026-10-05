@@ -6,4 +6,7 @@ return [
 
     // Erinnerung an offene Rückmeldungen: so viele Stunden vor Fristende
     'form_reminder_hours' => 48,
+
+    // Geheimnis für den KAS-Cronjob-Aufruf /cron/{secret}
+    'cron_secret' => env('CRON_SECRET'),
 ];

@@ -7,7 +7,7 @@ use App\Http\Controllers\PushSubscriptionController;
 use App\Livewire;
 use Illuminate\Support\Facades\Route;
 
-// Signierter Einmal-Login nur auf dem Testsystem (erzeugt per: php artisan mip:login-link <benutzername>)
+// Signierter, zeitlich begrenzter Test-Login nur auf dem Testsystem (erzeugt per: php artisan mip:login-link <benutzername>)
 if (app()->environment('local', 'staging')) {
     Route::get('/dev-login/{user}', function (\App\Models\User $user) {
         \Illuminate\Support\Facades\Auth::login($user);
@@ -16,6 +16,16 @@ if (app()->environment('local', 'staging')) {
         return redirect()->route('home');
     })->middleware('signed')->name('dev-login');
 }
+
+// KAS-Cronjob (All-Inkl ruft nur URLs auf): treibt den Laravel-Scheduler. Geheimnis in CRON_SECRET.
+Route::get('/cron/{secret}', function (string $secret) {
+    abort_unless(filled(config('mip.cron_secret')) && hash_equals(config('mip.cron_secret'), $secret), 403);
+    ignore_user_abort(true);
+    set_time_limit(120);
+    \Illuminate\Support\Facades\Artisan::call('schedule:run');
+
+    return response('ok', 200)->header('Content-Type', 'text/plain');
+})->middleware('throttle:10,1')->name('cron');
 
 Route::middleware('guest')->group(function () {
     Route::get('/anmelden', [AuthController::class, 'showLogin'])->name('login');
