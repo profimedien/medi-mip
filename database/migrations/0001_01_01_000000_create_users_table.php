@@ -13,10 +13,32 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->string('username')->unique();
+            $table->string('email')->nullable()->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
+            $table->text('start_code')->nullable(); // verschlüsselt, nur bis zum ersten Login
+            $table->boolean('must_change_password')->default(true);
+            $table->string('status')->default('invited'); // invited, active, disabled
+            $table->string('personnel_number')->nullable();
+            $table->string('job_title')->nullable();
+            $table->date('entry_date')->nullable();
+            $table->unsignedTinyInteger('birthday_day')->nullable();
+            $table->unsignedTinyInteger('birthday_month')->nullable();
+            $table->foreignId('location_id')->nullable()->index();
+            // freiwillige Profilangaben
+            $table->boolean('profile_visible')->default(false);
+            $table->boolean('show_birthday')->default(false);
+            $table->boolean('show_anniversary')->default(true);
+            $table->string('phone_extension')->nullable();
+            $table->string('work_email')->nullable();
+            $table->text('qualifications')->nullable();
+            $table->text('about')->nullable();
+            // Benachrichtigungen: ['news' => 'instant', 'digest' => true, 'push' => false]
+            $table->json('notification_settings')->nullable();
+            $table->timestamp('last_login_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
