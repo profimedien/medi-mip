@@ -33,6 +33,9 @@ class StructureSeeder extends Seeder
         ['Verwaltung und Geschäftsleitung', 'Verwaltung', 'Heilig-Kreuz-Str. 4', '91522', 'Ansbach', ['Verwaltung', 'Geschäftsleitung']],
     ];
 
+    /** Nachtrag medi 09.10.2026: an allen Standorten zuordenbar, Admins räumen bei Bedarf auf. */
+    public const EVERYWHERE = ['People & Culture', 'Küche', 'RV Fit', 'Praktikantinnen und Praktikanten', 'Fachliche Leitungen', 'Abteilungsleitungen'];
+
     public function run(): void
     {
         foreach (['gesamt-admin', 'standort-admin', 'abteilungs-admin', 'mitarbeiter'] as $role) {
@@ -44,16 +47,19 @@ class StructureSeeder extends Seeder
                 'short_name' => $short, 'street' => $street, 'zip' => $zip, 'city' => $city, 'sort' => $i,
             ]);
             $ids = [];
-            foreach ($departments as $dep) {
+            foreach ([...$departments, ...self::EVERYWHERE] as $dep) {
                 $ids[] = Department::firstOrCreate(['name' => $dep])->id;
             }
             $location->departments()->sync($ids);
         }
 
-        // Weiterleitungen: echte Adressen liefert medi noch (Fragenkatalog Abschnitt 2)
+        // Weiterleitungen laut medi (Mails vom 09.10. und 16.10.2026).
+        // DATEV: Einstiegsadresse statt des gemailten Links, der eine einmalige Anmelde-Sitzung enthält.
         foreach ([
-            ['Time Card', '#', 'Zeiterfassung · Link folgt'],
-            ['DATEV Arbeitnehmer online', '#', 'Lohnabrechnung · Link folgt'],
+            ['Time Card', 'https://medi.timecard365.de/', 'Ein- und auschecken, Urlaub eintragen'],
+            ['DATEV Arbeitnehmer online', 'https://apps.datev.de/ano/', 'Gehaltsabrechnung abrufen'],
+            ['Benefits App', 'https://ihre.mitarbeiterangebote.de/login', 'Mitarbeiterangebote'],
+            ['Givve Card', 'https://card.givve.com/login', 'Guthabenkarte'],
             ['medi-Website', 'https://www.medi-ansbach.de', 'Unser Auftritt für Patienten'],
         ] as $i => [$title, $url, $desc]) {
             Link::updateOrCreate(['title' => $title], ['url' => $url, 'description' => $desc, 'sort' => $i]);
