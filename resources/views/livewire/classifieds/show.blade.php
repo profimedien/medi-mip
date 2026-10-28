@@ -56,7 +56,7 @@
             @if ($classified->user_id === auth()->id() || auth()->user()->isAdmin())
                 <div class="mt-auto flex gap-3 pt-4 text-sm">
                     @if ($classified->user_id === auth()->id() && ! $classified->extended)<button wire:click="extend" class="text-medi-sky">Um {{ \App\Models\Classified::RUNTIME_DAYS }} Tage verlängern</button>@endif
-                    <button wire:click="remove" wire:confirm="Anzeige wirklich löschen?" class="text-medi-red">Löschen</button>
+                    <button x-on:click="$store.confirm.ask('Anzeige wirklich löschen?', () => $wire.remove())" class="text-medi-red">Löschen</button>
                 </div>
             @endif
         </div>

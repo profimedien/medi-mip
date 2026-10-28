@@ -92,7 +92,7 @@
                         <span class="text-xs">{{ $ad->expires_at->isPast() ? 'abgelaufen' : 'bis '.$ad->expires_at->format('d.m.Y') }}</span>
                         <span class="ml-auto flex gap-3">
                             @unless ($ad->extended)<button wire:click="extend({{ $ad->id }})" class="text-medi-sky">Verlängern</button>@endunless
-                            <button wire:click="remove({{ $ad->id }})" wire:confirm="Anzeige wirklich löschen?" class="text-medi-red">Löschen</button>
+                            <button x-on:click="$store.confirm.ask('Anzeige wirklich löschen?', () => $wire.remove({{ $ad->id }}))" class="text-medi-red">Löschen</button>
                         </span>
                     </li>
                 @endforeach

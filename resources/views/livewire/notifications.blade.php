@@ -10,7 +10,7 @@
                 <span class="min-w-0">
                     <span class="block font-medium text-medi-navy">{{ $n->data['title'] ?? 'Mitteilung' }}</span>
                     @if (! empty($n->data['body']))<span class="block truncate">{{ $n->data['body'] }}</span>@endif
-                    <span class="text-xs">{{ $n->created_at->diffForHumans() }}</span>
+                    <span class="text-xs">{{ $n->created_at->gt(now()->subMinute()) ? 'gerade eben' : $n->created_at->diffForHumans() }}</span>
                 </span>
             </button>
         @empty

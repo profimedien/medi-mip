@@ -26,7 +26,26 @@ Route::get('/cron/{secret}', function (string $secret) {
     if ($php = config('mip.php_binary')) {
         putenv('PHP_BINARY='.$php);
     }
+    // Fehlgeschlagene Befehle mitschreiben, damit der Aufruf nicht trotzdem "ok" meldet
+    $failed = [];
+    \Illuminate\Support\Facades\Event::listen(\Illuminate\Console\Events\ScheduledTaskFinished::class, function ($e) use (&$failed) {
+        if ($e->task->exitCode) {
+            $failed[] = $e->task->command;
+        }
+    });
+    \Illuminate\Support\Facades\Event::listen(\Illuminate\Console\Events\ScheduledTaskFailed::class, function ($e) use (&$failed) {
+        $failed[] = $e->task->command;
+    });
     \Illuminate\Support\Facades\Artisan::call('schedule:run');
+
+    $failed = array_values(array_unique($failed));
+    \App\Models\Setting::set('cron_last_run', now()->toIso8601String());
+    if ($failed) {
+        \App\Models\Setting::set('cron_last_error', now()->format('d.m.Y H:i').': '.implode(', ', $failed));
+
+        return response("Fehler:\n".implode("\n", $failed), 500)->header('Content-Type', 'text/plain');
+    }
+    \App\Models\Setting::set('cron_last_ok', now()->toIso8601String());
 
     return response('ok', 200)->header('Content-Type', 'text/plain');
 })->middleware('throttle:10,1')->name('cron');

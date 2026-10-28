@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             DemoUserSeeder::class,
             DemoContentSeeder::class,
             DemoImageSeeder::class,
+            DemoRefreshSeeder::class,
         ]);
     }
 }

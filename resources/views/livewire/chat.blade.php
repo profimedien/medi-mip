@@ -96,7 +96,7 @@
                     <p class="text-xs">{{ $group->type === 'direct' ? 'Direktchat' : $group->members->count().' Mitglieder' }}{{ $group->read_only ? ' · nur Moderation schreibt' : '' }}</p>
                 </div>
                 @if ($group->type === 'custom')
-                    <button wire:click="leaveGroup" wire:confirm="Gruppe wirklich verlassen?" class="ml-auto text-xs text-medi-red">Verlassen</button>
+                    <button x-on:click="$store.confirm.ask('Gruppe wirklich verlassen?', () => $wire.leaveGroup(), 'Verlassen')" class="ml-auto text-xs text-medi-red">Verlassen</button>
                 @endif
             </div>
 
@@ -123,7 +123,7 @@
                             <div @class(['mt-0.5 flex items-center gap-2 text-[10px]', 'text-white/70' => $mine, 'text-medi-gray/70' => ! $mine])>
                                 {{ $msg->created_at->format('d.m. H:i') }}
                                 @if (! $msg->deleted_at && ($mine || $isModerator))
-                                    <button wire:click="deleteMessage({{ $msg->id }})" wire:confirm="Nachricht löschen?" class="hidden underline group-hover:inline">löschen</button>
+                                    <button x-on:click="$store.confirm.ask('Nachricht löschen?', () => $wire.deleteMessage({{ $msg->id }}))" class="hidden underline group-hover:inline">löschen</button>
                                 @endif
                             </div>
                         </div>

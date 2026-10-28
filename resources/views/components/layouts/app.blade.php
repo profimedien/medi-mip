@@ -125,5 +125,25 @@
             </form>
         </div>
     </div>
+    {{-- Eigene Sicherheitsabfrage statt Browser-Dialog: $store.confirm.ask('Frage?', () => $wire.aktion(), 'Löschen') --}}
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('confirm', {
+                open: false, text: '', label: 'Löschen', callback: null,
+                ask(text, callback, label = 'Löschen') { Object.assign(this, { text, callback, label, open: true }) },
+                yes() { this.open = false; this.callback?.() },
+            });
+        });
+    </script>
+    <div x-cloak x-show="$store.confirm.open" x-transition.opacity class="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4"
+         x-on:keydown.escape.window="$store.confirm.open = false" x-on:click.self="$store.confirm.open = false">
+        <div class="card w-full max-w-xs text-center" role="alertdialog" aria-modal="true">
+            <p class="font-medium text-medi-navy" x-text="$store.confirm.text"></p>
+            <div class="mt-5 grid grid-cols-2 gap-2">
+                <button type="button" class="btn-ghost" x-on:click="$store.confirm.open = false">Abbrechen</button>
+                <button type="button" class="btn bg-medi-red hover:bg-medi-red/90" x-on:click="$store.confirm.yes()" x-text="$store.confirm.label"></button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

@@ -2,7 +2,7 @@
     <h1 class="text-2xl font-bold">Mitmachen</h1>
     <div class="flex gap-1 overflow-x-auto rounded-xl bg-white p-1 ring-1 ring-black/5">
         @foreach (['vorschlag' => 'Verbesserungsvorschlag', 'material' => 'Materialanfrage', 'empfehlung' => 'Mitarbeiter werben'] as $key => $label)
-            <button wire:click="$set('tab', '{{ $key }}'); $set('done', null)" @class(['shrink-0 rounded-lg px-3 py-2 text-sm font-medium', 'bg-medi-blue text-white' => $tab === $key, 'hover:bg-medi-bg' => $tab !== $key])>{{ $label }}</button>
+            <button wire:click="$set('tab', '{{ $key }}')" @class(['shrink-0 rounded-lg px-3 py-2 text-sm font-medium', 'bg-medi-blue text-white' => $tab === $key, 'hover:bg-medi-bg' => $tab !== $key])>{{ $label }}</button>
         @endforeach
     </div>
 
