@@ -35,7 +35,7 @@ class Classifieds extends Component
             'ad.price' => ['nullable', 'string', 'max:50'],
             'photos' => ['array', 'max:4'],
             'photos.*' => ['image', 'max:8192'],
-        ], [], ['ad.topic' => 'Kategorie', 'ad.title' => 'Titel', 'ad.body' => 'Beschreibung', 'photos.*' => 'Foto'])['ad'];
+        ], ['ad.topic.required' => 'Bitte eine Kategorie auswählen.'], ['ad.topic' => 'Kategorie', 'ad.title' => 'Titel', 'ad.body' => 'Beschreibung', 'photos.*' => 'Foto'])['ad'];
 
         $classified = Classified::create($data + ['user_id' => auth()->id(), 'expires_at' => now()->addDays(Classified::RUNTIME_DAYS)]);
         foreach ($this->photos as $photo) {

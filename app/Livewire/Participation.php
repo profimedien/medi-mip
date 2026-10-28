@@ -32,12 +32,18 @@ class Participation extends Component
         $this->material['location_id'] = (string) auth()->user()->location_id;
     }
 
+    public function updatedTab(): void
+    {
+        $this->done = null;
+        $this->resetValidation();
+    }
+
     public function sendSuggestion(): void
     {
         $data = $this->validate([
             'suggestion.topic' => ['required', 'string'],
             'suggestion.body' => ['required', 'string', 'min:10', 'max:5000'],
-        ], [], ['suggestion.topic' => 'Thema', 'suggestion.body' => 'Vorschlag'])['suggestion'];
+        ], ['suggestion.topic.required' => 'Bitte ein Thema auswählen.'], ['suggestion.topic' => 'Thema', 'suggestion.body' => 'Vorschlag'])['suggestion'];
         Suggestion::create($data + ['user_id' => auth()->id()]);
         $this->notify('suggestion_recipients', 'Neuer Verbesserungsvorschlag: '.$data['topic'], $data['body'], 'suggestions');
         $this->reset('suggestion');

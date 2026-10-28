@@ -63,7 +63,7 @@
                         </span>
                         <span class="min-w-0 flex-1">
                             <span class="block truncate font-medium text-medi-navy">{{ $g->titleFor(auth()->user()) }}</span>
-                            <span class="block text-xs">{{ \App\Models\ChatGroup::TYPES[$g->type] }}{{ $g->last_message_at ? ' · '.$g->last_message_at->diffForHumans(short: true) : '' }}</span>
+                            <span class="block text-xs">{{ \App\Models\ChatGroup::TYPES[$g->type] }}{{ $g->last_message_at ? ' · '.($g->last_message_at->gt(now()->subMinute()) ? 'gerade eben' : $g->last_message_at->diffForHumans(short: true)) : '' }}</span>
                         </span>
                         @if ($unread)<span class="rounded-full bg-medi-red px-2 text-xs font-bold text-white">{{ $unread }}</span>@endif
                     </a>
@@ -111,7 +111,7 @@
                             @if ($msg->deleted_at)
                                 <em class="opacity-70">Nachricht gelöscht</em>
                             @else
-                                @if ($msg->body)<div class="whitespace-pre-line break-words">{{ $msg->body }}</div>@endif
+                                @if ($msg->body)<div class="whitespace-pre-line break-words">{!! preg_replace('~https?://[^\s<]+~', '<a href="$0" target="_blank" rel="noopener" class="underline">$0</a>', e($msg->body)) !!}</div>@endif
                                 @foreach ($msg->getMedia('files') as $file)
                                     @if (str_starts_with($file->mime_type, 'image/'))
                                         <a href="{{ route('media.show', $file) }}" target="_blank"><img src="{{ route('media.show', [$file, 'thumb']) }}" alt="" class="mt-1 max-h-60 rounded-lg"></a>

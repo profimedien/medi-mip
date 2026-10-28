@@ -22,6 +22,10 @@ Route::get('/cron/{secret}', function (string $secret) {
     abort_unless(filled(config('mip.cron_secret')) && hash_equals(config('mip.cron_secret'), $secret), 403);
     ignore_user_abort(true);
     set_time_limit(120);
+    // Der Scheduler startet jeden Befehl als eigenen PHP-Prozess. Im Webaufruf findet er sonst das System-PHP (zu alt) statt php84.
+    if ($php = config('mip.php_binary')) {
+        putenv('PHP_BINARY='.$php);
+    }
     \Illuminate\Support\Facades\Artisan::call('schedule:run');
 
     return response('ok', 200)->header('Content-Type', 'text/plain');
@@ -29,7 +33,7 @@ Route::get('/cron/{secret}', function (string $secret) {
 
 Route::middleware('guest')->group(function () {
     Route::get('/anmelden', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/anmelden', [AuthController::class, 'login'])->middleware('throttle:20,1');
+    Route::post('/anmelden', [AuthController::class, 'login'])->middleware('throttle:300,1'); // Klinik-WLAN: viele Kolleginnen und Kollegen teilen eine IP
 });
 
 Route::middleware(['auth', 'account.ready'])->group(function () {

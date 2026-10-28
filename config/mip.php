@@ -9,4 +9,7 @@ return [
 
     // Geheimnis für den KAS-Cronjob-Aufruf /cron/{secret}
     'cron_secret' => env('CRON_SECRET'),
+
+    // PHP für die Befehle des Schedulers beim Aufruf über /cron (All-Inkl: /usr/bin/php84)
+    'php_binary' => env('MIP_PHP_BINARY'),
 ];

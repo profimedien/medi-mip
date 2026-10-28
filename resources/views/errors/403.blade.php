@@ -1,0 +1,1 @@
+@include('errors.minimal', ['code' => 403, 'heading' => 'Kein Zugriff', 'text' => 'Diese Seite ist für Ihr Konto nicht freigegeben. Wenn Sie glauben, dass das ein Fehler ist, wenden Sie sich bitte an Ihre Ansprechperson in der Verwaltung.'])

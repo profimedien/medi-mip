@@ -54,7 +54,7 @@ class DemoContentSeeder extends Seeder
 
         // Termine
         $events = [
-            ['Sommerfest der medi Gruppe', 40, 'Ansbach, Reha-Zentrum', true],
+            ['Mitarbeiterfest der medi Gruppe', 40, 'Ansbach, Reha-Zentrum', true],
             ['Erste-Hilfe-Auffrischung', 12, 'Fürth, Schulungsraum', false],
             ['Betriebsversammlung', 25, 'Ansbach', false],
             ['Fortbildung Manuelle Therapie', 18, 'online', false],
@@ -115,7 +115,7 @@ class DemoContentSeeder extends Seeder
 
         // Rückmeldungen
         $sommerfest = Form::create([
-            'title' => 'Sommerfest: Wer ist dabei?',
+            'title' => 'Mitarbeiterfest: Wer ist dabei?',
             'description' => '<p>Bitte geben Sie bis zur Frist Bescheid, ob Sie dabei sind.</p>',
             'choices' => ['Zusage', 'Absage', 'Vielleicht'], 'deadline' => now()->addDays(20), 'audience_all' => true,
             'author_id' => $admin->id, 'published_at' => now()->subDay(), 'notified_at' => now()->subDay(),

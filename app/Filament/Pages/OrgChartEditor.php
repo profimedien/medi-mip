@@ -32,7 +32,8 @@ class OrgChartEditor extends Page
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->isGesamtAdmin() ?? false;
+        // gleiche Rechte wie die Organigramm-Einträge (Wissensbereich: alle Admin-Ebenen)
+        return auth()->user()?->isAdmin() ?? false;
     }
 
     public function getSubheading(): ?string
