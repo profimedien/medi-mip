@@ -8,6 +8,9 @@
                 <button wire:click="openNewGroup" class="rounded-lg p-1.5 text-medi-blue hover:bg-medi-bg" title="Neue Gruppe" aria-label="Neue Gruppe"><x-heroicon-o-user-group class="size-6" /></button>
             </div>
         </div>
+        <div class="border-b border-black/5 p-3">
+            <input type="search" wire:model.live.debounce.300ms="search" class="input py-2" placeholder="Gruppen und Nachrichten durchsuchen" aria-label="Chat durchsuchen">
+        </div>
         @if ($newGroup)
             <form wire:submit="createGroup" class="space-y-3 border-b border-black/5 bg-medi-bg/50 p-3">
                 <p class="text-sm font-bold text-medi-navy">Neue Gruppe</p>
@@ -35,6 +38,10 @@
                     @endforeach
                     @error('groupMembers')<p class="mt-1 text-xs text-medi-red">{{ $message }}</p>@enderror
                 </div>
+                <label class="flex items-start gap-2 text-xs">
+                    <input type="checkbox" wire:model="membersCanInvite" class="mt-0.5 rounded text-medi-blue">
+                    <span>Alle Mitglieder dürfen weitere Personen hinzufügen. Sonst nur Sie als Gruppen-Admin.</span>
+                </label>
                 <div class="flex gap-2">
                     <button class="btn flex-1">Gruppe erstellen</button>
                     <button type="button" wire:click="$set('newGroup', false)" class="btn-ghost">Abbrechen</button>
@@ -49,6 +56,24 @@
                         <x-avatar :user="$person" class="size-7 text-[10px]" /> {{ $person->name }} <span class="text-xs">{{ $person->location?->label }}</span>
                     </a>
                 @endforeach
+            </div>
+        @endif
+        @if (mb_strlen(trim($search)) >= 2)
+            <div class="max-h-[45%] overflow-y-auto border-b border-black/5">
+                <p class="px-4 pb-1 pt-3 text-xs font-bold uppercase tracking-wide text-medi-gray/70">Nachrichten</p>
+                @forelse ($foundMessages as $hit)
+                    <a href="{{ route('chat', $hit->chat_group_id) }}" wire:navigate wire:key="hit{{ $hit->id }}" class="block px-4 py-2 text-sm hover:bg-medi-bg">
+                        <span class="flex items-baseline justify-between gap-2">
+                            <span class="truncate font-medium text-medi-navy">{{ $hit->group->titleFor(auth()->user()) }}</span>
+                            <span class="shrink-0 text-[11px]">{{ $hit->created_at->format('d.m.y') }}</span>
+                        </span>
+                        <span class="line-clamp-2 text-xs"><span class="font-medium">{{ $hit->user?->first_name }}:</span> {{ \Illuminate\Support\Str::limit($hit->body, 140) }}</span>
+                    </a>
+                @empty
+                    <p class="px-4 pb-3 text-xs">Keine Nachrichten gefunden.</p>
+                @endforelse
+                <p class="px-4 pb-1 pt-3 text-xs font-bold uppercase tracking-wide text-medi-gray/70">Gruppen und Chats</p>
+                @if ($groups->isEmpty())<p class="px-4 pb-3 text-xs">Keine passende Gruppe.</p>@endif
             </div>
         @endif
         <ul class="flex-1 overflow-y-auto" wire:poll.15s>
@@ -95,10 +120,30 @@
                     @endif
                     <p class="text-xs">{{ $group->type === 'direct' ? 'Direktchat' : $group->members->count().' Mitglieder' }}{{ $group->read_only ? ' · nur Moderation schreibt' : '' }}</p>
                 </div>
+                @if ($canInvite)
+                    <button wire:click="openInvite" class="rounded-lg p-1.5 text-medi-blue hover:bg-medi-bg" title="Personen hinzufügen" aria-label="Personen hinzufügen"><x-heroicon-o-user-plus class="size-5" /></button>
+                @endif
                 @if ($group->type === 'custom')
                     <button x-on:click="$store.confirm.ask('Gruppe wirklich verlassen?', () => $wire.leaveGroup(), 'Verlassen')" class="ml-auto text-xs text-medi-red">Verlassen</button>
                 @endif
             </div>
+            @if ($inviting && $canInvite)
+                <div class="space-y-2 border-b border-black/5 bg-medi-bg/50 p-3">
+                    <input type="search" wire:model.live.debounce.300ms="inviteSearch" class="input" placeholder="Person suchen und hinzufügen" autofocus>
+                    @foreach ($inviteResults as $person)
+                        <button type="button" wire:click="invite({{ $person->id }})" class="flex w-full items-center gap-2 rounded-lg p-2 text-left text-sm hover:bg-white">
+                            <x-avatar :user="$person" class="size-7 text-[10px]" /> {{ $person->name }} <span class="text-xs">{{ $person->location?->label }}</span>
+                            <x-heroicon-o-plus class="ml-auto size-4 text-medi-blue" />
+                        </button>
+                    @endforeach
+                    @if ($isModerator)
+                        <label class="flex items-center gap-2 pt-1 text-xs">
+                            <input type="checkbox" wire:click="toggleMembersCanInvite" @checked($group->members_can_invite) class="rounded text-medi-blue">
+                            Alle Mitglieder dürfen Personen hinzufügen
+                        </label>
+                    @endif
+                </div>
+            @endif
 
             <div class="flex-1 space-y-3 overflow-y-auto p-4" wire:poll.5s x-data x-init="$el.scrollTop = $el.scrollHeight"
                  @chat-sent.window="$nextTick(() => $el.scrollTop = $el.scrollHeight)">

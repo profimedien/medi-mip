@@ -85,4 +85,34 @@ class ChatTest extends TestCase
         Livewire::actingAs($a)->withQueryParams(['direct' => $max->id])->test(Chat::class)->assertRedirect();
         $this->assertNotNull(ChatGroup::where('type', 'direct')->whereHas('members', fn ($q) => $q->where('user_id', $max->id))->first());
     }
+
+    public function test_einladen_nur_moderation_ausser_freigegeben(): void
+    {
+        $owner = $this->person();
+        $member = $this->person();
+        $guest = $this->person();
+        $group = ChatGroup::create(['type' => 'custom', 'name' => 'Lauftreff']);
+        $group->members()->createMany([['user_id' => $owner->id, 'is_moderator' => true], ['user_id' => $member->id]]);
+
+        Livewire::actingAs($member)->test(Chat::class, ['group' => $group])->call('invite', $guest->id)->assertForbidden();
+        Livewire::actingAs($member)->test(Chat::class, ['group' => $group])->call('toggleMembersCanInvite')->assertForbidden();
+        Livewire::actingAs($owner)->test(Chat::class, ['group' => $group])->call('toggleMembersCanInvite');
+        $this->assertTrue($group->fresh()->members_can_invite);
+        Livewire::actingAs($member)->test(Chat::class, ['group' => $group->fresh()])->call('invite', $guest->id)->assertHasNoErrors();
+        $this->assertNotNull($group->fresh()->membership($guest));
+    }
+
+    public function test_suche_findet_nachrichten_nur_in_eigenen_gruppen(): void
+    {
+        $a = $this->person();
+        $b = $this->person();
+        $c = $this->person();
+        $mine = ChatGroup::directBetween($a, $b);
+        $other = ChatGroup::directBetween($b, $c);
+        ChatMessage::create(['chat_group_id' => $mine->id, 'user_id' => $b->id, 'body' => 'Dienstplan Dezember ist fertig']);
+        ChatMessage::create(['chat_group_id' => $other->id, 'user_id' => $c->id, 'body' => 'Dienstplan geheim']);
+
+        Livewire::actingAs($a)->test(Chat::class)->set('search', 'Dienstplan')
+            ->assertSee('Dienstplan Dezember ist fertig')->assertDontSee('Dienstplan geheim');
+    }
 }

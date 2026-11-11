@@ -37,6 +37,14 @@ class Chat extends Component
 
     public string $memberSearch = '';
 
+    public bool $membersCanInvite = false;
+
+    public string $search = '';
+
+    public bool $inviting = false;
+
+    public string $inviteSearch = '';
+
     public bool $renaming = false;
 
     public string $newName = '';
@@ -157,7 +165,7 @@ class Chat extends Component
             'groupMembers.*' => ['integer', 'exists:users,id'],
         ], ['groupMembers.required' => 'Bitte mindestens eine Person hinzufügen.'], ['groupName' => 'Gruppenname']);
 
-        $group = ChatGroup::create(['type' => 'custom', 'name' => $this->groupName, 'last_message_at' => now()]);
+        $group = ChatGroup::create(['type' => 'custom', 'name' => $this->groupName, 'members_can_invite' => $this->membersCanInvite, 'last_message_at' => now()]);
         ChatMember::create(['chat_group_id' => $group->id, 'user_id' => auth()->id(), 'is_moderator' => true]);
         foreach (array_unique($this->groupMembers) as $id) {
             if ($id !== auth()->id()) {
@@ -165,9 +173,40 @@ class Chat extends Component
             }
         }
         ChatMessage::create(['chat_group_id' => $group->id, 'user_id' => auth()->id(), 'body' => auth()->user()->first_name.' hat die Gruppe „'.$this->groupName.'“ erstellt.']);
-        $this->reset('newGroup', 'groupName', 'groupMembers', 'memberSearch');
+        $this->reset('newGroup', 'groupName', 'groupMembers', 'memberSearch', 'membersCanInvite');
 
         return $this->redirectRoute('chat', ['group' => $group], navigate: true);
+    }
+
+    public function openInvite(): void
+    {
+        abort_unless($this->group?->canInvite(auth()->user()), 403);
+        $this->inviting = ! $this->inviting;
+        $this->inviteSearch = '';
+    }
+
+    /** Person in eine bestehende eigene Gruppe holen */
+    public function invite(int $id): void
+    {
+        $user = auth()->user();
+        abort_unless($this->group?->canInvite($user), 403);
+        $person = User::where('status', '!=', 'disabled')->findOrFail($id);
+        if (! $this->group->members()->where('user_id', $person->id)->exists()) {
+            ChatMember::create(['chat_group_id' => $this->group->id, 'user_id' => $person->id]);
+            ChatMessage::create(['chat_group_id' => $this->group->id, 'user_id' => $user->id,
+                'body' => $user->first_name.' hat '.$person->name.' zur Gruppe hinzugefügt.']);
+            $this->group->update(['last_message_at' => now()]);
+        }
+        $this->inviteSearch = '';
+    }
+
+    /** Nur die Moderation legt fest, ob alle Mitglieder einladen dürfen */
+    public function toggleMembersCanInvite(): void
+    {
+        $user = auth()->user();
+        abort_unless($this->group && $this->group->type === 'custom'
+            && ($this->group->membership($user)?->is_moderator || $user->isGesamtAdmin()), 403);
+        $this->group->update(['members_can_invite' => ! $this->group->members_can_invite]);
     }
 
     public function leaveGroup()
@@ -194,6 +233,17 @@ class Chat extends Component
         $groups = ChatGroup::forUser($user)->with(['users', 'members'])
             ->orderByRaw("type = 'announcement' desc")->orderByDesc('last_message_at')->orderBy('name')->get();
 
+        // Suche: eigene Gruppen und Direktchats nach Name, dazu alle Nachrichten in diesen Unterhaltungen
+        $term = trim($this->search);
+        $foundMessages = collect();
+        if (mb_strlen($term) >= 2) {
+            $needle = mb_strtolower($term);
+            $foundMessages = ChatMessage::whereIn('chat_group_id', $groups->pluck('id'))->whereNull('deleted_at')
+                ->where('body', 'like', '%'.addcslashes($term, '%_\\').'%')
+                ->with('user', 'group.users')->latest('id')->limit(30)->get();
+            $groups = $groups->filter(fn (ChatGroup $g) => str_contains(mb_strtolower($g->titleFor($user)), $needle))->values();
+        }
+
         $messages = collect();
         if ($this->group) {
             $messages = $this->group->messages()->with('user', 'media')->latest('id')->limit($this->limit)->get()->reverse()->values();
@@ -212,7 +262,16 @@ class Chat extends Component
                 ->with('location')->limit(6)->get()
             : collect();
 
+        $inviteResults = $this->inviting && $this->group && strlen($this->inviteSearch) >= 2
+            ? User::where('status', '!=', 'disabled')->whereNotIn('id', $this->group->members()->pluck('user_id'))
+                ->where(fn ($q) => $q->where('first_name', 'like', "%{$this->inviteSearch}%")->orWhere('last_name', 'like', "%{$this->inviteSearch}%"))
+                ->with('location')->limit(6)->get()
+            : collect();
+
         return view('livewire.chat', [
+            'foundMessages' => $foundMessages,
+            'inviteResults' => $inviteResults,
+            'canInvite' => $this->group?->canInvite($user) ?? false,
             'memberResults' => $memberResults,
             'selectedMembers' => User::whereIn('id', $this->groupMembers)->get(),
             'groups' => $groups,

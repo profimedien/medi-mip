@@ -20,7 +20,7 @@ class ChatGroup extends Model
 
     protected $guarded = ['id'];
 
-    protected $casts = ['read_only' => 'boolean', 'last_message_at' => 'datetime'];
+    protected $casts = ['read_only' => 'boolean', 'members_can_invite' => 'boolean', 'last_message_at' => 'datetime'];
 
     public function members(): HasMany
     {
@@ -65,6 +65,17 @@ class ChatGroup extends Model
         }
 
         return ! $this->read_only || $member->is_moderator || $user->isGesamtAdmin();
+    }
+
+    /** Eigene Gruppen: Moderation lädt immer ein, alle Mitglieder nur, wenn die Moderation es erlaubt */
+    public function canInvite(User $user): bool
+    {
+        if ($this->type !== 'custom') {
+            return false;
+        }
+        $member = $this->membership($user);
+
+        return ($member && ($member->is_moderator || $this->members_can_invite)) || $user->isGesamtAdmin();
     }
 
     /** Anzeigename; bei Direktchats der Name des Gegenübers */
