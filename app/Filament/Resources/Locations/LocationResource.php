@@ -24,6 +24,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -51,7 +52,9 @@ class LocationResource extends Resource
         return $schema->columns(2)->components([
             TextInput::make('name')->label('Name')->required()->columnSpanFull(),
             TextInput::make('short_name')->label('Kurzname')->required()->helperText('Für Listen und Chatgruppen'),
-            TextInput::make('phone')->label('Telefon'),
+            TextInput::make('phone')->label('Telefon')->helperText('Zentrale, z. B. 09171 1234-0. Daraus wird im Verzeichnis die volle Durchwahl gebildet.'),
+            Select::make('color')->label('Farbe im Kalender')->options(Location::COLORS)
+                ->helperText('Ohne Grün und Orange, die stehen für Jubiläen und Geburtstage.'),
             TextInput::make('street')->label('Straße'),
             TextInput::make('zip')->label('PLZ'),
             TextInput::make('city')->label('Ort'),
@@ -66,6 +69,7 @@ class LocationResource extends Resource
             ->defaultSort('sort')->reorderable('sort')
             ->columns([
                 TextColumn::make('short_name')->label('Kurzname')->weight('medium'),
+                ColorColumn::make('color')->label('Farbe'),
                 TextColumn::make('name')->label('Name')->wrap(),
                 TextColumn::make('departments.name')->label('Abteilungen')->badge()->limitList(4),
                 TextColumn::make('users_count')->counts('users')->label('Personen'),

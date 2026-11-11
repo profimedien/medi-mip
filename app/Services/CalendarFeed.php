@@ -8,7 +8,8 @@ use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 
 /**
- * Kalendereinträge für einen Zeitraum: Termine (blau), Jubiläen (grün), Geburtstage (orange).
+ * Kalendereinträge für einen Zeitraum: Termine (blau), Fortbildungen (violett), Jubiläen (grün), Geburtstage (orange).
+ * location_id je Eintrag für die Standortfarbe: bei Terminen nur, wenn genau ein Standort Zielgruppe ist.
  * Geburtstage nur mit Zustimmung der Person, ohne Alter. Jubiläen ab 5 Jahren im 5-Jahres-Takt.
  */
 class CalendarFeed
@@ -23,9 +24,10 @@ class CalendarFeed
             ->orderBy('starts_at')->get();
         foreach ($events as $event) {
             $entries->push([
-                'type' => 'event', 'date' => CarbonImmutable::parse($event->starts_at)->startOfDay(),
+                'type' => $event->category === 'training' ? 'training' : 'event', 'date' => CarbonImmutable::parse($event->starts_at)->startOfDay(),
                 'title' => $event->title, 'time' => $event->all_day ? null : $event->starts_at->format('H:i'),
                 'place' => $event->place, 'description' => $event->description,
+                'location_id' => count($event->audience_locations) === 1 ? $event->audience_locations[0] : null,
             ]);
         }
 
@@ -40,7 +42,7 @@ class CalendarFeed
                     $date = CarbonImmutable::create($year, $person->birthday_month, $person->birthday_day);
                     if ($date->betweenIncluded($from->startOfDay(), $to->endOfDay())) {
                         $entries->push(['type' => 'birthday', 'date' => $date, 'title' => 'Geburtstag: '.$person->name,
-                            'place' => $person->location?->label, 'user_id' => $person->id]);
+                            'place' => $person->location?->label, 'user_id' => $person->id, 'location_id' => $person->location_id]);
                     }
                 }
                 if ($person->show_anniversary && $person->entry_date) {
@@ -48,7 +50,7 @@ class CalendarFeed
                     $date = CarbonImmutable::create($year, $person->entry_date->month, min($person->entry_date->day, 28));
                     if ($years >= 5 && $years % 5 === 0 && $date->betweenIncluded($from->startOfDay(), $to->endOfDay())) {
                         $entries->push(['type' => 'anniversary', 'date' => $date, 'title' => $years.' Jahre bei medi: '.$person->name,
-                            'place' => $person->location?->label, 'user_id' => $person->id]);
+                            'place' => $person->location?->label, 'user_id' => $person->id, 'location_id' => $person->location_id]);
                     }
                 }
             }

@@ -51,6 +51,7 @@ class EventResource extends Resource
         return $schema->columns(3)->components([
             Section::make([
                 TextInput::make('title')->label('Titel')->required(),
+                Select::make('category')->label('Kategorie')->options(Event::CATEGORIES)->default('event')->required()->selectablePlaceholder(false),
                 Textarea::make('description')->label('Beschreibung')->rows(3),
                 TextInput::make('place')->label('Ort'),
                 DateTimePicker::make('starts_at')->label('Beginn')->required()->seconds(false),
@@ -67,12 +68,14 @@ class EventResource extends Resource
             ->defaultSort('starts_at', 'desc')
             ->columns([
                 TextColumn::make('title')->label('Titel')->searchable()->weight('medium'),
+                TextColumn::make('category')->label('Kategorie')->badge()->formatStateUsing(fn ($state) => Event::CATEGORIES[$state] ?? $state)
+                    ->color(fn ($state) => $state === 'training' ? 'primary' : 'gray'),
                 TextColumn::make('starts_at')->label('Beginn')->dateTime('d.m.Y H:i')->sortable(),
                 TextColumn::make('place')->label('Ort'),
                 TextColumn::make('audience')->label('Zielgruppe')->state(fn ($record) => $record->audienceLabel())->badge()->color('info'),
             ])
             ->filters([
-
+                SelectFilter::make('category')->label('Kategorie')->options(Event::CATEGORIES),
             ])
             ->recordActions([
                 EditAction::make()->mutateDataUsing(fn (array $data) => Fields::guardAudience($data)),

@@ -10,6 +10,9 @@ class Event extends Model
 {
     use HasAudience;
 
+    /** Kategorien im Kalender (Feedback 11.11.2026: Fortbildung ergänzt) */
+    public const CATEGORIES = ['event' => 'Termin', 'training' => 'Fortbildung'];
+
     protected $guarded = ['id'];
 
     protected $casts = ['starts_at' => 'datetime', 'ends_at' => 'datetime', 'all_day' => 'boolean'];

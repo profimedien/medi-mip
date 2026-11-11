@@ -18,14 +18,33 @@ class Calendar extends Component
     #[Url]
     public string $location = 'mine';
 
-    public array $types = ['event', 'anniversary', 'birthday'];
+    public const TYPES = ['event', 'training', 'anniversary', 'birthday'];
+
+    public array $types = self::TYPES;
 
     public ?string $day = null;
 
     public function mount(): void
     {
+        // gemerkte Filter der Person, sofern der Aufruf nicht selbst einen Standort mitbringt
+        $saved = auth()->user()->calendar_filter ?? [];
+        if (! request()->has('location') && isset($saved['location'])) {
+            $this->location = (string) $saved['location'];
+        }
+        if (isset($saved['types']) && is_array($saved['types'])) {
+            $this->types = array_values(array_intersect(self::TYPES, $saved['types']));
+        }
         $this->month = $this->month ?: now()->format('Y-m');
         $this->day = now()->format('Y-m') === $this->month ? now()->toDateString() : null;
+    }
+
+    /** Filter je Person merken (Feedback 11.11.2026: nicht auf Standard zurückfallen) */
+    public function updated(string $property): void
+    {
+        if ($property === 'location' || str_starts_with($property, 'types')) {
+            $this->types = array_values(array_intersect(self::TYPES, $this->types));
+            auth()->user()->update(['calendar_filter' => ['location' => $this->location, 'types' => $this->types]]);
+        }
     }
 
     public function shift(int $months): void
@@ -63,6 +82,7 @@ class Calendar extends Component
         }
 
         $selected = $this->day ? CarbonImmutable::parse($this->day) : null;
+        $locations = Location::where('active', true)->orderBy('sort')->get();
 
         return view('livewire.calendar', [
             'start' => $start,
@@ -71,7 +91,8 @@ class Calendar extends Component
             'selected' => $selected,
             'selectedEntries' => $selected ? ($entries[$selected->toDateString()] ?? collect()) : collect(),
             'monthEntries' => $entries->filter(fn ($v, $k) => str_starts_with($k, $this->month))->flatten(1),
-            'locations' => Location::where('active', true)->orderBy('sort')->get(),
+            'locations' => $locations,
+            'locationColors' => $locations->pluck('color', 'id')->filter()->all(),
         ]);
     }
 }

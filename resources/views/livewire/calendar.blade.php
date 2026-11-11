@@ -1,6 +1,6 @@
 @php
-    $colors = ['event' => 'bg-medi-blue', 'anniversary' => 'bg-emerald-600', 'birthday' => 'bg-orange-500'];
-    $chips = ['event' => 'bg-medi-blue/10 text-medi-blue', 'anniversary' => 'bg-emerald-50 text-emerald-700', 'birthday' => 'bg-orange-50 text-orange-700'];
+    $colors = ['event' => 'bg-medi-blue', 'training' => 'bg-violet-600', 'anniversary' => 'bg-emerald-600', 'birthday' => 'bg-orange-500'];
+    $chips = ['event' => 'bg-medi-blue/10 text-medi-blue', 'training' => 'bg-violet-50 text-violet-700', 'anniversary' => 'bg-emerald-50 text-emerald-700', 'birthday' => 'bg-orange-50 text-orange-700'];
     $today = now()->toDateString();
 @endphp
 <div class="space-y-4">
@@ -17,6 +17,7 @@
     {{-- Filter --}}
     <div class="flex flex-wrap items-center gap-2 text-sm">
         <label class="flex items-center gap-1.5 rounded-full bg-white px-3 py-1 ring-1 ring-black/5"><input type="checkbox" wire:model.live="types" value="event" class="rounded text-medi-blue"> <span class="size-2.5 rounded-full bg-medi-blue"></span> Termine</label>
+        <label class="flex items-center gap-1.5 rounded-full bg-white px-3 py-1 ring-1 ring-black/5"><input type="checkbox" wire:model.live="types" value="training" class="rounded text-violet-600"> <span class="size-2.5 rounded-full bg-violet-600"></span> Fortbildungen</label>
         <label class="flex items-center gap-1.5 rounded-full bg-white px-3 py-1 ring-1 ring-black/5"><input type="checkbox" wire:model.live="types" value="anniversary" class="rounded text-emerald-600"> <span class="size-2.5 rounded-full bg-emerald-600"></span> Jubiläen</label>
         <label class="flex items-center gap-1.5 rounded-full bg-white px-3 py-1 ring-1 ring-black/5"><input type="checkbox" wire:model.live="types" value="birthday" class="rounded text-orange-500"> <span class="size-2.5 rounded-full bg-orange-500"></span> Geburtstage</label>
         <select wire:model.live="location" class="input ml-auto w-auto py-1.5">
@@ -27,6 +28,17 @@
             @endforeach
         </select>
     </div>
+
+    {{-- Standortfarben: kleiner Punkt vor dem Eintrag --}}
+    @if ($locationColors)
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+            <span class="font-medium text-medi-gray/80">Standorte:</span>
+            @foreach ($locations as $loc)
+                @continue(empty($locationColors[$loc->id]))
+                <span class="inline-flex items-center gap-1"><span class="size-2 rounded-full" style="background-color: {{ $locationColors[$loc->id] }}"></span>{{ $loc->label }}</span>
+            @endforeach
+        </div>
+    @endif
 
     {{-- Monatsraster --}}
     <div class="card overflow-hidden p-0">
@@ -68,8 +80,9 @@
                         <span class="hidden space-y-0.5 sm:block">
                             @foreach ($list->take(3) as $e)
                                 <span class="flex items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-[11px] font-medium {{ $chips[$e['type']] }}">
-                                    @if ($e['type'] === 'birthday')<x-heroicon-s-cake class="size-3 shrink-0" />@elseif ($e['type'] === 'anniversary')<x-heroicon-s-trophy class="size-3 shrink-0" />@endif
-                                    <span class="truncate">@if (! empty($e['time'])){{ $e['time'] }} @endif{{ $e['type'] === 'event' ? $e['title'] : \Illuminate\Support\Str::after($e['title'], ': ') }}</span>
+                                    @if (! empty($e['location_id']) && ! empty($locationColors[$e['location_id']]))<span class="size-2 shrink-0 rounded-full" style="background-color: {{ $locationColors[$e['location_id']] }}"></span>@endif
+                                    @if ($e['type'] === 'birthday')<x-heroicon-s-cake class="size-3 shrink-0" />@elseif ($e['type'] === 'anniversary')<x-heroicon-s-trophy class="size-3 shrink-0" />@elseif ($e['type'] === 'training')<x-heroicon-s-academic-cap class="size-3 shrink-0" />@endif
+                                    <span class="truncate">@if (! empty($e['time'])){{ $e['time'] }} @endif{{ in_array($e['type'], ['event', 'training']) ? $e['title'] : \Illuminate\Support\Str::after($e['title'], ': ') }}</span>
                                 </span>
                             @endforeach
                             @if ($list->count() > 3)
@@ -90,7 +103,7 @@
                 <button wire:click="$set('day', null)" class="text-sm text-medi-sky">ganzer Monat</button>
             </div>
             @forelse ($selectedEntries as $entry)
-                @include('livewire.partials.calendar-entry', ['entry' => $entry])
+                @include('livewire.partials.calendar-entry', ['entry' => $entry, 'locationColors' => $locationColors])
             @empty
                 <p class="py-3 text-sm">An diesem Tag steht nichts an.</p>
             @endforelse
@@ -98,7 +111,7 @@
             <h2 class="mb-1 font-bold">Alles im {{ $start->translatedFormat('F') }}</h2>
             <div class="divide-y divide-black/5">
                 @forelse ($monthEntries as $entry)
-                    @include('livewire.partials.calendar-entry', ['entry' => $entry])
+                    @include('livewire.partials.calendar-entry', ['entry' => $entry, 'locationColors' => $locationColors])
                 @empty
                     <p class="py-3 text-sm">In diesem Monat gibt es keine Einträge.</p>
                 @endforelse

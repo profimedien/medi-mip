@@ -4,7 +4,7 @@
 @source '../../storage/framework/views/*.php';
 @source '../views/**/*.blade.php';
 @source '../../app/Livewire/**/*.php';
-@source inline('border-medi-blue border-emerald-600 border-orange-500');
+@source inline('border-medi-blue border-violet-600 border-emerald-600 border-orange-500');
 
 @theme {
     --font-sans: 'Ubuntu', ui-sans-serif, system-ui, sans-serif;

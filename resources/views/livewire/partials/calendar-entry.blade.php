@@ -1,9 +1,11 @@
 @php
     $styles = [
         'event' => ['bg-medi-blue', 'calendar-days', 'Termin'],
+        'training' => ['bg-violet-600', 'academic-cap', 'Fortbildung'],
         'anniversary' => ['bg-emerald-600', 'trophy', 'Jubiläum'],
         'birthday' => ['bg-orange-500', 'cake', 'Geburtstag'],
     ][$entry['type']];
+    $locationColor = ! empty($entry['location_id']) ? (($locationColors ?? [])[$entry['location_id']] ?? null) : null;
 @endphp
 <div class="flex gap-3 py-2">
     <div class="w-11 shrink-0 text-center">
@@ -15,8 +17,9 @@
             <x-dynamic-component :component="'heroicon-o-'.$styles[1]" class="size-4 shrink-0" />
             <span class="truncate">{{ $entry['title'] }}</span>
         </div>
-        <div class="text-xs">
-            {{ $entry['date']->translatedFormat('l') }}{{ ! empty($entry['time']) ? ', '.$entry['time'].' Uhr' : '' }}{{ ! empty($entry['place']) ? ' · '.$entry['place'] : '' }}
+        <div class="flex flex-wrap items-center gap-x-1 text-xs">
+            @if ($locationColor)<span class="size-2 rounded-full" style="background-color: {{ $locationColor }}"></span>@endif
+            {{ $entry['type'] === 'training' ? 'Fortbildung · ' : '' }}{{ $entry['date']->translatedFormat('l') }}{{ ! empty($entry['time']) ? ', '.$entry['time'].' Uhr' : '' }}{{ ! empty($entry['place']) ? ' · '.$entry['place'] : '' }}
         </div>
         @if (empty($compact) && ! empty($entry['description']))
             <p class="mt-1 text-sm">{{ $entry['description'] }}</p>

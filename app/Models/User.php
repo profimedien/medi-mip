@@ -43,6 +43,7 @@ class User extends Authenticatable implements FilamentUser, HasMedia, HasName
             'show_birthday' => 'boolean',
             'show_anniversary' => 'boolean',
             'notification_settings' => 'array',
+            'calendar_filter' => 'array',
         ];
     }
 
