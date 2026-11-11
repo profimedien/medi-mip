@@ -21,7 +21,7 @@ class Classifieds extends Component
 
     public bool $showForm = false;
 
-    public array $ad = ['category' => 'private', 'topic' => '', 'title' => '', 'body' => '', 'price' => ''];
+    public array $ad = ['category' => 'business', 'topic' => '', 'title' => '', 'body' => '', 'price' => ''];
 
     public array $photos = [];
 

@@ -13,7 +13,8 @@ class Classified extends Model implements HasMedia
 {
     use InteractsWithMedia;
 
-    public const CATEGORIES = ['private' => 'Privat', 'business' => 'Dienstlich'];
+    /** Reihenfolge laut medi: erst dienstlich, dann privat; dienstlich ist Standard */
+    public const CATEGORIES = ['business' => 'Dienstlich', 'private' => 'Privat'];
 
     public const RUNTIME_DAYS = 30;
 

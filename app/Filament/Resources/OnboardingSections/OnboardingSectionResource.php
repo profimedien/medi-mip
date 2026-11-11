@@ -49,7 +49,7 @@ class OnboardingSectionResource extends Resource
     {
         return $schema->columns(1)->components([
             TextInput::make('title')->label('Titel')->required(),
-            Select::make('icon')->label('Symbol')->options(['clock' => 'Uhr', 'heart' => 'Herz', 'sun' => 'Sonne', 'academic-cap' => 'Fortbildung', 'gift' => 'Geschenk', 'bolt' => 'Rad/Energie', 'document-text' => 'Dokument', 'currency-euro' => 'Geld', 'shield-check' => 'Sicherheit']),
+            Select::make('icon')->label('Symbol')->options(['clock' => 'Uhr', 'heart' => 'Herz', 'sun' => 'Sonne', 'academic-cap' => 'Fortbildung', 'gift' => 'Geschenk', 'bolt' => 'Rad/Energie', 'document-text' => 'Dokument', 'currency-euro' => 'Geld', 'shield-check' => 'Sicherheit', 'scale' => 'Gesetze und Recht']),
             RichEditor::make('body')->label('Inhalt')->toolbarButtons([['bold', 'italic', 'link'], ['h2', 'h3'], ['bulletList', 'orderedList']]),
             TextInput::make('video_url')->label('Erklärvideo (YouTube- oder Vimeo-Link)')->url(),
             Fields::upload('documents', 'Formulare und Dokumente', multiple: true),

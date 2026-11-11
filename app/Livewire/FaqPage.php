@@ -32,7 +32,7 @@ class FaqPage extends Component
     public function render()
     {
         $term = trim($this->search);
-        $categories = FaqCategory::orderBy('sort')->with(['faqs' => fn ($q) => $q->where('published', true)
+        $categories = FaqCategory::orderBy('sort')->with(['faqs' => fn ($q) => $q->where('published', true)->with('media')
             ->when($term, fn ($q) => $q->where(fn ($q) => $q->where('question', 'like', "%$term%")->orWhere('answer', 'like', "%$term%")))])
             ->get()->filter(fn ($c) => $c->faqs->isNotEmpty());
 

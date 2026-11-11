@@ -51,6 +51,13 @@ class FaqResource extends Resource
             Select::make('faq_category_id')->label('Kategorie')->relationship('category', 'name')->required()->createOptionForm([TextInput::make('name')->label('Name')->required()]),
             TextInput::make('question')->label('Frage')->required(),
             RichEditor::make('answer')->label('Antwort')->required()->toolbarButtons([['bold', 'italic', 'link'], ['bulletList', 'orderedList']]),
+            Fields::upload('images', 'Bilder', multiple: true, images: true),
+            TextInput::make('video_url')->label('Video (YouTube- oder Vimeo-Link, höchstens eins)')->url()
+                ->rule(fn () => function (string $attribute, $value, \Closure $fail) {
+                    if (filled($value) && ! \App\Livewire\Onboarding::embedUrl($value)) {
+                        $fail('Bitte einen YouTube- oder Vimeo-Link eintragen.');
+                    }
+                }),
             Toggle::make('published')->label('Veröffentlicht')->default(true),
         ]);
     }
@@ -62,6 +69,7 @@ class FaqResource extends Resource
             ->columns([
                 TextColumn::make('question')->label('Frage')->searchable()->wrap()->weight('medium'),
                 TextColumn::make('category.name')->label('Kategorie')->badge(),
+                IconColumn::make('video_url')->label('Video')->boolean()->state(fn ($record) => filled($record->video_url)),
                 IconColumn::make('published')->label('Sichtbar')->boolean(),
             ])
             ->filters([

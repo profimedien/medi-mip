@@ -15,6 +15,9 @@ class FormField extends Model
         'number' => 'Zahl',
     ];
 
+    /** Standardfrage bei neuen Rückmeldungen (Veranstaltungen), je Rückmeldung entfernbar */
+    public const MEDIA_CONSENT = 'Ich bin einverstanden, dass bei der Veranstaltung Bild- und Tonaufnahmen von mir gemacht und für die interne Kommunikation von medi genutzt werden.';
+
     protected $guarded = ['id'];
 
     protected $casts = ['options' => 'array', 'required' => 'boolean'];

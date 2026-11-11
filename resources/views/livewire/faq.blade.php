@@ -15,6 +15,18 @@
                             <x-heroicon-o-chevron-down class="size-4 shrink-0 transition group-open:rotate-180" />
                         </summary>
                         <div class="prose-medi mt-2 text-sm">{!! $faq->answer !!}</div>
+                        @if ($faq->getMedia('images')->isNotEmpty())
+                            <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                                @foreach ($faq->getMedia('images') as $img)
+                                    <a href="{{ route('media.show', $img) }}" target="_blank"><img src="{{ route('media.show', [$img, 'thumb']) }}" alt="" loading="lazy" class="aspect-video w-full rounded-xl object-cover"></a>
+                                @endforeach
+                            </div>
+                        @endif
+                        @if ($embed = \App\Livewire\Onboarding::embedUrl($faq->video_url))
+                            <div class="mt-3 aspect-video overflow-hidden rounded-xl bg-black">
+                                <iframe src="{{ $embed }}" class="size-full" allow="fullscreen; picture-in-picture" loading="lazy" title="{{ $faq->question }}"></iframe>
+                            </div>
+                        @endif
                     </details>
                 @endforeach
             </div>

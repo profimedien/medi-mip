@@ -35,9 +35,11 @@ class FormForm
                     Toggle::make('requires_signature')->label('Unterschrift verlangen'),
                 ]),
                 Section::make('Zusatzfragen')
-                    ->description('Werden bei Zusage bzw. immer gestellt, wenn es keine Zu-/Absage gibt. Beispiel: Essenswunsch, Begleitpersonen, Unverträglichkeiten.')
+                    ->description('Werden bei Zusage bzw. immer gestellt, wenn es keine Zu-/Absage gibt. Beispiel: Essenswunsch, Begleitpersonen, Unverträglichkeiten. Neue Rückmeldungen fragen standardmäßig die Zustimmung zu Bild- und Tonaufnahmen ab, bei Bedarf einfach entfernen.')
                     ->schema([
                         Repeater::make('fields')->relationship()->hiddenLabel()
+                            // Standard bei neuen Rückmeldungen: Zustimmung zu Bild- und Tonaufnahmen (entfernbar)
+                            ->default([['label' => FormField::MEDIA_CONSENT, 'type' => 'boolean', 'required' => false]])
                             ->orderColumn('sort')->collapsible()->cloneable()
                             ->itemLabel(fn (array $state) => $state['label'] ?? null)
                             ->addActionLabel('Frage hinzufügen')
