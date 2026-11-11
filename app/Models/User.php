@@ -96,6 +96,23 @@ class User extends Authenticatable implements FilamentUser, HasMedia, HasName
         return $this->name;
     }
 
+    /**
+     * Durchwahl mit voller Rufnummer des Standorts, z. B. Zentrale "09171 1234-0" und Durchwahl 219 ergibt "09171 1234-219".
+     * Ohne gepflegte Standortnummer bleibt es bei der Durchwahl.
+     */
+    public function fullExtension(): ?string
+    {
+        if (blank($this->phone_extension)) {
+            return null;
+        }
+        $base = trim((string) $this->location?->phone);
+        if ($base === '') {
+            return $this->phone_extension;
+        }
+
+        return preg_replace('/\s*-\s*0$/', '', $base).'-'.ltrim(trim($this->phone_extension), '-');
+    }
+
     public function initials(): string
     {
         return Str::upper(Str::substr($this->first_name, 0, 1).Str::substr($this->last_name, 0, 1));

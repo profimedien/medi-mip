@@ -22,7 +22,9 @@
             <label class="flex items-center gap-2 text-sm"><input type="checkbox" wire:model="profile.show_anniversary" class="rounded text-medi-blue"> Dienstjubiläum im Kalender zeigen</label>
         </div>
         <div class="grid gap-4 sm:grid-cols-2">
-            <div><label class="label">Dienstliche Durchwahl</label><input type="text" wire:model="profile.phone_extension" class="input"></div>
+            <div><label class="label">Dienstliche Durchwahl</label><input type="text" wire:model="profile.phone_extension" class="input" placeholder="z. B. 219"><p class="mt-1 text-xs">Im Verzeichnis mit der Rufnummer Ihres Standorts.</p></div>
+            <div><label class="label">Telefon</label><input type="tel" wire:model="profile.phone" class="input">@error('profile.phone')<p class="mt-1 text-sm text-medi-red">{{ $message }}</p>@enderror</div>
+            <div><label class="label">Handy</label><input type="tel" wire:model="profile.mobile" class="input">@error('profile.mobile')<p class="mt-1 text-sm text-medi-red">{{ $message }}</p>@enderror</div>
             <div><label class="label">Dienstliche E-Mail</label><input type="email" wire:model="profile.work_email" class="input">@error('profile.work_email')<p class="mt-1 text-sm text-medi-red">{{ $message }}</p>@enderror</div>
             <div class="sm:col-span-2"><label class="label">Qualifikationen</label><textarea wire:model="profile.qualifications" rows="2" class="input"></textarea></div>
             <div class="sm:col-span-2"><label class="label">Über mich</label><textarea wire:model="profile.about" rows="3" class="input"></textarea></div>

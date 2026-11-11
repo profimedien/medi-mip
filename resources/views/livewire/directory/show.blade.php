@@ -11,7 +11,9 @@
         <dl class="mt-5 grid gap-3 text-sm sm:grid-cols-2">
             <div><dt class="text-xs uppercase tracking-wide text-medi-gray/70">Standort</dt><dd class="font-medium text-medi-navy">{{ $user->location?->label }}</dd></div>
             <div><dt class="text-xs uppercase tracking-wide text-medi-gray/70">Abteilung</dt><dd class="font-medium text-medi-navy">{{ $user->departments->pluck('name')->join(', ') }}</dd></div>
-            @if ($user->phone_extension)<div><dt class="text-xs uppercase tracking-wide text-medi-gray/70">Durchwahl</dt><dd class="font-medium text-medi-navy">{{ $user->phone_extension }}</dd></div>@endif
+            @if ($ext = $user->fullExtension())<div><dt class="text-xs uppercase tracking-wide text-medi-gray/70">Durchwahl</dt><dd><a href="tel:{{ preg_replace('/[^0-9+]/', '', $ext) }}" class="font-medium text-medi-sky">{{ $ext }}</a></dd></div>@endif
+            @if ($user->phone)<div><dt class="text-xs uppercase tracking-wide text-medi-gray/70">Telefon</dt><dd><a href="tel:{{ preg_replace('/[^0-9+]/', '', $user->phone) }}" class="font-medium text-medi-sky">{{ $user->phone }}</a></dd></div>@endif
+            @if ($user->mobile)<div><dt class="text-xs uppercase tracking-wide text-medi-gray/70">Handy</dt><dd><a href="tel:{{ preg_replace('/[^0-9+]/', '', $user->mobile) }}" class="font-medium text-medi-sky">{{ $user->mobile }}</a></dd></div>@endif
             @if ($user->work_email)<div><dt class="text-xs uppercase tracking-wide text-medi-gray/70">E-Mail</dt><dd><a href="mailto:{{ $user->work_email }}" class="font-medium text-medi-sky">{{ $user->work_email }}</a></dd></div>@endif
             @if ($user->qualifications)<div class="sm:col-span-2"><dt class="text-xs uppercase tracking-wide text-medi-gray/70">Qualifikationen</dt><dd>{{ $user->qualifications }}</dd></div>@endif
             @if ($user->about)<div class="sm:col-span-2"><dt class="text-xs uppercase tracking-wide text-medi-gray/70">Über mich</dt><dd>{{ $user->about }}</dd></div>@endif

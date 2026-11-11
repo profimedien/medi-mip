@@ -12,6 +12,7 @@
             <h1 class="mt-3 text-2xl font-bold">{{ $contact->name }}</h1>
             <p class="font-medium text-medi-blue">{{ $contact->responsibility }}</p>
             @if ($contact->location)<p class="mt-1 text-sm">{{ $contact->location->name }}</p>@endif
+            @if ($contact->type === 'external')<p class="mt-1"><span class="badge">Externer Ansprechpartner</span></p>@endif
 
             @if ($contact->description)
                 <p class="mt-4 whitespace-pre-line text-sm">{{ $contact->description }}</p>
@@ -31,6 +32,14 @@
                     </a>
                 @endif
             </div>
+            @if ($contact->user && $contact->user->status !== 'disabled' && $contact->user_id !== auth()->id())
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <a href="{{ route('chat', ['direct' => $contact->user_id]) }}" wire:navigate class="btn"><x-heroicon-o-chat-bubble-left-right class="size-4" /> Nachricht schreiben</a>
+                    @if ($contact->user->profile_visible)
+                        <a href="{{ route('directory.show', $contact->user_id) }}" wire:navigate class="btn-ghost"><x-heroicon-o-user class="size-4" /> Profil im Verzeichnis</a>
+                    @endif
+                </div>
+            @endif
             @if ($contact->availability)
                 <p class="mt-4 flex items-center gap-2 text-sm"><x-heroicon-o-clock class="size-4 text-medi-blue" /> Erreichbar: {{ $contact->availability }}</p>
             @endif

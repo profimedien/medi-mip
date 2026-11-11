@@ -28,7 +28,7 @@ class Profile extends Component
     public function mount(): void
     {
         $u = auth()->user();
-        $this->profile = $u->only(['profile_visible', 'show_birthday', 'show_anniversary', 'phone_extension', 'work_email', 'qualifications', 'about']);
+        $this->profile = $u->only(['profile_visible', 'show_birthday', 'show_anniversary', 'phone_extension', 'phone', 'mobile', 'work_email', 'qualifications', 'about']);
         foreach (['mail_news', 'mail_forms', 'mail_chat_digest'] as $key) {
             $this->notify[$key] = (bool) $u->notificationSetting($key);
         }
@@ -41,6 +41,8 @@ class Profile extends Component
             'profile.show_birthday' => ['boolean'],
             'profile.show_anniversary' => ['boolean'],
             'profile.phone_extension' => ['nullable', 'string', 'max:30'],
+            'profile.phone' => ['nullable', 'string', 'max:40'],
+            'profile.mobile' => ['nullable', 'string', 'max:40'],
             'profile.work_email' => ['nullable', 'email', 'max:255'],
             'profile.qualifications' => ['nullable', 'string', 'max:1000'],
             'profile.about' => ['nullable', 'string', 'max:1000'],

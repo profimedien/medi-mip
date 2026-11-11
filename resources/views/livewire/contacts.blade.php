@@ -1,6 +1,11 @@
 <div class="space-y-4">
     <div class="flex flex-wrap items-center gap-3">
         <h1 class="mr-auto text-2xl font-bold">Ansprechpartner</h1>
+        <div class="flex rounded-xl bg-white p-1 ring-1 ring-black/5">
+            @foreach (['' => 'Alle', 'internal' => 'Intern', 'external' => 'Extern'] as $k => $v)
+                <button wire:click="$set('type', '{{ $k }}')" @class(['rounded-lg px-3 py-1.5 text-sm font-medium', 'bg-medi-blue text-white' => $type === $k, 'hover:bg-medi-bg' => $type !== $k])>{{ $v }}</button>
+            @endforeach
+        </div>
         <select wire:model.live="location" class="input w-full sm:w-64">
             <option value="">Alle Standorte</option>
             @foreach ($locations as $loc)
@@ -23,7 +28,12 @@
                     </span>
                     <x-heroicon-o-chevron-right class="ml-auto size-5 shrink-0 text-medi-gray/50" />
                 </a>
-                @if ($contact->location)<div class="mt-1"><span class="badge">{{ $contact->location->label }}</span></div>@endif
+                @if ($contact->location || $contact->type === 'external')
+                    <div class="mt-1 flex flex-wrap gap-1">
+                        @if ($contact->type === 'external')<span class="badge">Extern</span>@endif
+                        @if ($contact->location)<span class="badge">{{ $contact->location->label }}</span>@endif
+                    </div>
+                @endif
                 <div class="mt-3 flex flex-wrap gap-2">
                     @if ($contact->phone)<a href="tel:{{ preg_replace('/[^0-9+]/', '', $contact->phone) }}" class="btn-ghost py-1.5"><x-heroicon-o-phone class="size-4" /> {{ $contact->phone }}</a>@endif
                     @if ($contact->email)<a href="mailto:{{ $contact->email }}" class="btn-ghost py-1.5"><x-heroicon-o-envelope class="size-4" /> E-Mail</a>@endif

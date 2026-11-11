@@ -12,11 +12,25 @@ class Contact extends Model implements HasMedia
 {
     use InteractsWithMedia;
 
+    /** intern: Kollegin oder Kollege aus den Mitarbeitenden, extern: frei gepflegt (z. B. EDV-Dienstleister, Betriebsarzt) */
+    public const TYPES = ['internal' => 'Intern', 'external' => 'Extern'];
+
     protected $guarded = ['id'];
+
+    protected static function booted(): void
+    {
+        // externe Ansprechpartner hängen an keiner Person aus dem Portal
+        static::saving(fn (Contact $c) => $c->type === 'external' ? $c->user_id = null : null);
+    }
 
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function registerMediaCollections(): void
