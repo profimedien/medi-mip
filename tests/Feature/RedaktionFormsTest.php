@@ -67,9 +67,9 @@ class RedaktionFormsTest extends TestCase
     {
         $this->admin();
         Livewire::test(ManageLocations::class)->callAction('create', data: [
-            'name' => 'Teststandort', 'short_name' => 'Test', 'color' => '#7c3aed', 'active' => true,
+            'name' => 'Teststandort', 'short_name' => 'Test', 'color' => '#9f1239', 'active' => true,
         ])->assertHasNoErrors();
-        $this->assertSame('#7c3aed', Location::where('short_name', 'Test')->value('color'));
+        $this->assertSame('#9f1239', Location::where('short_name', 'Test')->value('color'));
     }
 
     public function test_neue_rueckmeldung_fragt_bild_und_ton_ab(): void
