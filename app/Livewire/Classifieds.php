@@ -56,7 +56,7 @@ class Classifieds extends Component
     public function remove(int $id): void
     {
         $c = Classified::findOrFail($id);
-        abort_unless($c->user_id === auth()->id() || auth()->user()->isAdmin(), 403);
+        abort_unless($c->user_id === auth()->id() || auth()->user()->canManageStaff(), 403);
         $c->delete();
     }
 

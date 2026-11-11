@@ -5,6 +5,7 @@ namespace App\Filament\Resources\OnboardingSections;
 use App\Filament\Resources\OnboardingSections\Pages\ManageOnboardingSections;
 use App\Filament\Support\Fields;
 use App\Filament\Support\GesamtAdminOnly;
+use App\Filament\Support\StaffAdminOnly;
 use App\Filament\Support\ScopedContent;
 use App\Models\OnboardingSection;
 use BackedEnum;
@@ -32,6 +33,8 @@ use UnitEnum;
 
 class OnboardingSectionResource extends Resource
 {
+    use StaffAdminOnly;
+
 
     protected static ?string $model = OnboardingSection::class;
 

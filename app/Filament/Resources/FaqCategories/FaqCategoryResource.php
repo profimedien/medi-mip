@@ -5,6 +5,7 @@ namespace App\Filament\Resources\FaqCategories;
 use App\Filament\Resources\FaqCategories\Pages\ManageFaqCategories;
 use App\Filament\Support\Fields;
 use App\Filament\Support\GesamtAdminOnly;
+use App\Filament\Support\StaffAdminOnly;
 use App\Filament\Support\ScopedContent;
 use App\Models\FaqCategory;
 use BackedEnum;
@@ -32,6 +33,8 @@ use UnitEnum;
 
 class FaqCategoryResource extends Resource
 {
+    use StaffAdminOnly;
+
 
     protected static ?string $model = FaqCategory::class;
 

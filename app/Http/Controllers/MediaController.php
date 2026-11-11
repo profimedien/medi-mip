@@ -24,9 +24,10 @@ class MediaController extends Controller
 
         $allowed = match (true) {
             $model === null => false,
-            $user->isAdmin() => true,
-            $model instanceof Post, $model instanceof Gallery, $model instanceof Form, $model instanceof Event => $model->isVisibleTo($user),
+            // Chat-Anhänge nur für Mitglieder der Gruppe, auch Admins sehen keine fremden Chats
             $model instanceof ChatMessage => $model->group->members()->where('user_id', $user->id)->exists(),
+            $user->canManageStaff() => true,
+            $model instanceof Post, $model instanceof Gallery, $model instanceof Form, $model instanceof Event => $model->isVisibleTo($user),
             default => true, // Profile, Kleinanzeigen, Onboarding: für alle Angemeldeten
         };
         abort_unless($allowed, 403);

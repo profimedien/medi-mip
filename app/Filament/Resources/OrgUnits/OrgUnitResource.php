@@ -5,6 +5,7 @@ namespace App\Filament\Resources\OrgUnits;
 use App\Filament\Resources\OrgUnits\Pages\ManageOrgUnits;
 use App\Filament\Support\Fields;
 use App\Filament\Support\GesamtAdminOnly;
+use App\Filament\Support\StaffAdminOnly;
 use App\Filament\Support\ScopedContent;
 use App\Models\OrgUnit;
 use BackedEnum;
@@ -32,6 +33,8 @@ use UnitEnum;
 
 class OrgUnitResource extends Resource
 {
+    use StaffAdminOnly;
+
 
     protected static ?string $model = OrgUnit::class;
 

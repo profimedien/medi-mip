@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Links;
 use App\Filament\Resources\Links\Pages\ManageLinks;
 use App\Filament\Support\Fields;
 use App\Filament\Support\GesamtAdminOnly;
+use App\Filament\Support\StaffAdminOnly;
 use App\Filament\Support\ScopedContent;
 use App\Models\Link;
 use BackedEnum;
@@ -32,6 +33,8 @@ use UnitEnum;
 
 class LinkResource extends Resource
 {
+    use StaffAdminOnly;
+
 
     protected static ?string $model = Link::class;
 
@@ -49,7 +52,10 @@ class LinkResource extends Resource
     {
         return $schema->columns(1)->components([
             TextInput::make('title')->label('Titel')->required(),
-            TextInput::make('url')->label('Adresse')->required()->helperText('z. B. https://… oder # als Platzhalter'),
+            TextInput::make('url')->label('Adresse')->required()
+                ->rule('regex:~^(https?://\S+|#)$~')
+                ->validationMessages(['regex' => 'Bitte eine Adresse mit https:// angeben oder # als Platzhalter.'])
+                ->helperText('z. B. https://… oder # als Platzhalter'),
             TextInput::make('description')->label('Kurzbeschreibung'),
             Toggle::make('in_menu')->label('Im linken Menü unter Schnellzugriff zeigen')
                 ->helperText('Die Box Schnellzugriff auf der Startseite zeigt weiterhin alle Weiterleitungen.'),

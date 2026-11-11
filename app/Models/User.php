@@ -221,6 +221,8 @@ class User extends Authenticatable implements FilamentUser, HasMedia, HasName
             'password' => null,
             'must_change_password' => true,
             'status' => $this->status === 'disabled' ? 'disabled' : 'invited',
+            // meldet alle Geräte ab, die über "Angemeldet bleiben" eingeloggt sind
+            'remember_token' => null,
         ])->save();
 
         return $code;

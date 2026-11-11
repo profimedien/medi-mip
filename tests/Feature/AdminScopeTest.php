@@ -45,6 +45,9 @@ class AdminScopeTest extends TestCase
         $this->assertFalse($lead->canManageStaff());
         $this->actingAs($lead)->get('/admin/users')->assertForbidden();
         $this->actingAs($lead)->get('/admin/posts')->assertOk();
+        foreach (['/admin/links', '/admin/contacts', '/admin/faqs', '/admin/faq-categories', '/admin/onboarding-sections', '/admin/org-units', '/admin/organigramm'] as $path) {
+            $this->actingAs($lead)->get($path)->assertForbidden();
+        }
 
         $lead->syncLeadershipDepartments();
         $this->assertContains($this->department('Fachliche Leitungen')->id, $lead->fresh()->departmentIds());

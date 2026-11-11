@@ -61,6 +61,13 @@ class AuthTest extends TestCase
         $this->assertMatchesRegularExpression('/^[A-Z2-9]{4}-[A-Z2-9]{4}$/', $code);
     }
 
+    public function test_neuer_startcode_meldet_alle_geraete_ab(): void
+    {
+        $user = $this->person('Fürth', ['Physiotherapie'], ['remember_token' => 'token-verlorenes-handy']);
+        $user->resetAccess();
+        $this->assertNull($user->fresh()->remember_token);
+    }
+
     public function test_nur_admins_kommen_in_die_redaktion(): void
     {
         $this->actingAs($this->person())->get('/admin')->assertForbidden();

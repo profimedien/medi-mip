@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Contacts;
 use App\Filament\Resources\Contacts\Pages\ManageContacts;
 use App\Filament\Support\Fields;
 use App\Filament\Support\GesamtAdminOnly;
+use App\Filament\Support\StaffAdminOnly;
 use App\Filament\Support\ScopedContent;
 use App\Models\Contact;
 use App\Models\User;
@@ -35,6 +36,8 @@ use UnitEnum;
 
 class ContactResource extends Resource
 {
+    use StaffAdminOnly;
+
 
     protected static ?string $model = Contact::class;
 

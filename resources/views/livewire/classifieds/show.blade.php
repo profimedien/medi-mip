@@ -53,7 +53,7 @@
             </div>
 
             <p class="mt-3 text-xs">{{ $classified->expires_at->isPast() ? 'Abgelaufen am' : 'Läuft bis' }} {{ $classified->expires_at->format('d.m.Y') }}</p>
-            @if ($classified->user_id === auth()->id() || auth()->user()->isAdmin())
+            @if ($classified->user_id === auth()->id() || auth()->user()->canManageStaff())
                 <div class="mt-auto flex gap-3 pt-4 text-sm">
                     @if ($classified->user_id === auth()->id() && ! $classified->extended)<button wire:click="extend" class="text-medi-sky">Um {{ \App\Models\Classified::RUNTIME_DAYS }} Tage verlängern</button>@endif
                     <button x-on:click="$store.confirm.ask('Anzeige wirklich löschen?', () => $wire.remove())" class="text-medi-red">Löschen</button>

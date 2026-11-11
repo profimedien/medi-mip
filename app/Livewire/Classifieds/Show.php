@@ -11,7 +11,7 @@ class Show extends Component
 
     public function mount(Classified $classified): void
     {
-        abort_unless($classified->expires_at->isFuture() || $classified->user_id === auth()->id() || auth()->user()->isAdmin(), 404);
+        abort_unless($classified->expires_at->isFuture() || $classified->user_id === auth()->id() || auth()->user()->canManageStaff(), 404);
     }
 
     public function extend(): void
@@ -24,7 +24,7 @@ class Show extends Component
 
     public function remove()
     {
-        abort_unless($this->classified->user_id === auth()->id() || auth()->user()->isAdmin(), 403);
+        abort_unless($this->classified->user_id === auth()->id() || auth()->user()->canManageStaff(), 403);
         $this->classified->delete();
 
         return $this->redirectRoute('classifieds', navigate: true);
