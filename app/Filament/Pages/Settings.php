@@ -29,7 +29,7 @@ class Settings extends Page
 
     public ?array $data = [];
 
-    public const KEYS = ['classified_topics', 'suggestion_topics', 'suggestion_recipients', 'material_recipients', 'referral_recipients', 'faq_recipients', 'referral_text'];
+    public const KEYS = ['classified_topics', 'suggestion_topics', 'suggestion_recipients', 'referral_recipients', 'faq_recipients', 'referral_text', 'help_text'];
 
     public static function canAccess(): bool
     {
@@ -52,16 +52,19 @@ class Settings extends Page
                 TextInput::make('suggestion_recipients')->label('Empfänger')->helperText($hint),
             ])->columns(2),
             Section::make('Weitere Empfänger')->schema([
-                TextInput::make('material_recipients')->label('Materialanfragen')->helperText($hint),
                 TextInput::make('faq_recipients')->label('Eingereichte FAQ-Fragen')->helperText($hint),
                 TextInput::make('referral_recipients')->label('Mitarbeiter werben Mitarbeiter')->helperText($hint),
-            ])->columns(3),
+            ])->columns(2),
             Section::make('Marktplatz')->schema([
                 Textarea::make('classified_topics')->label('Kategorien (eine pro Zeile)')->rows(7)
                     ->helperText('Bestehende Anzeigen behalten ihre Kategorie, auch wenn sie hier entfernt wird.'),
             ]),
             Section::make('Mitarbeiter werben Mitarbeiter')->schema([
                 Textarea::make('referral_text')->label('Text zu Prämie und Bedingungen')->rows(5),
+            ]),
+            Section::make('medi hilft')->schema([
+                Textarea::make('help_text')->label('Informationen und Anträge')->rows(6)
+                    ->helperText('Erscheint unter Mitmachen im Reiter „medi hilft“. Links (https://…) werden anklickbar, z. B. auf einen Antrag als PDF.'),
             ]),
         ]);
     }

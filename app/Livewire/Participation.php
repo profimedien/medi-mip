@@ -2,8 +2,6 @@
 
 namespace App\Livewire;
 
-use App\Models\Location;
-use App\Models\MaterialRequest;
 use App\Models\Referral;
 use App\Models\Setting;
 use App\Models\Suggestion;
@@ -21,15 +19,19 @@ class Participation extends Component
 
     public array $suggestion = ['topic' => '', 'body' => ''];
 
-    public array $material = ['item' => '', 'quantity' => '', 'location_id' => '', 'needed_by' => '', 'note' => ''];
-
     public array $referral = ['candidate_name' => '', 'candidate_contact' => '', 'position' => '', 'note' => ''];
 
     public ?string $done = null;
 
+    /** Reiter: Schlüssel => Beschriftung. Materialanfrage entfällt seit 11.11.2026 */
+    public const TABS = ['vorschlag' => 'Ideenbörse', 'empfehlung' => 'Mitarbeiter werben', 'hilfe' => 'medi hilft'];
+
     public function mount(): void
     {
-        $this->material['location_id'] = (string) auth()->user()->location_id;
+        // alte oder unbekannte Reiter (z. B. ?tab=material aus Lesezeichen) auf den ersten Reiter
+        if (! array_key_exists($this->tab, self::TABS)) {
+            $this->tab = 'vorschlag';
+        }
     }
 
     public function updatedTab(): void
@@ -48,25 +50,6 @@ class Participation extends Component
         $this->notify('suggestion_recipients', 'Neue Idee aus der Ideenbörse: '.$data['topic'], $data['body'], 'suggestions');
         $this->reset('suggestion');
         $this->done = 'Danke für Ihre Idee! Sie ist bei den Zuständigen angekommen.';
-    }
-
-    public function sendMaterial(): void
-    {
-        $data = $this->validate([
-            'material.item' => ['required', 'string', 'max:255'],
-            'material.quantity' => ['nullable', 'string', 'max:100'],
-            'material.location_id' => ['nullable', 'exists:locations,id'],
-            'material.needed_by' => ['nullable', 'date', 'after_or_equal:today'],
-            'material.note' => ['nullable', 'string', 'max:2000'],
-        ], [], ['material.item' => 'Material', 'material.needed_by' => 'Datum'])['material'];
-        $data = array_map(fn ($v) => $v === '' ? null : $v, $data);
-        $req = MaterialRequest::create($data + ['user_id' => auth()->id()]);
-        $loc = $req->location?->label ?? 'ohne Standort';
-        $this->notify('material_recipients', 'Materialanfrage: '.$data['item'],
-            "Menge: {$req->quantity}\nStandort: {$loc}\nBenötigt bis: ".($req->needed_by?->format('d.m.Y') ?? 'offen')."\n\n".$req->note, 'material-requests');
-        $this->reset('material');
-        $this->mount();
-        $this->done = 'Ihre Materialanfrage ist verschickt.';
     }
 
     public function sendReferral(): void
@@ -96,8 +79,8 @@ class Participation extends Component
     {
         return view('livewire.participation', [
             'topics' => array_filter(array_map('trim', explode("\n", (string) Setting::get('suggestion_topics', 'Sonstiges')))),
-            'locations' => Location::where('active', true)->orderBy('sort')->get(),
             'referralText' => Setting::get('referral_text', ''),
+            'helpText' => Setting::get('help_text', ''),
         ]);
     }
 }

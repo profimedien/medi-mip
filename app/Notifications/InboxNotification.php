@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-/** Formular-Eingang an eine Fachstelle (Vorschlag, Materialanfrage, Empfehlung, FAQ-Frage) */
+/** Formular-Eingang an eine Fachstelle (Idee, Empfehlung, FAQ-Frage) */
 class InboxNotification extends Notification implements ShouldQueue
 {
     use Queueable;

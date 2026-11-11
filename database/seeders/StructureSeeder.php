@@ -68,7 +68,6 @@ class StructureSeeder extends Seeder
         foreach ([
             'suggestion_topics' => "Abläufe\nAusstattung\nIT\nArbeitsplatz\nSonstiges",
             'suggestion_recipients' => 'info@profimedien.net',
-            'material_recipients' => 'info@profimedien.net',
             'referral_recipients' => 'info@profimedien.net',
             'faq_recipients' => 'info@profimedien.net',
             'referral_text' => "Du kennst jemanden, der gut zu uns passt? Empfiehl uns weiter!\n\nFür jede erfolgreiche Einstellung nach Probezeit gibt es eine Prämie. Höhe und Bedingungen ergänzt die Personalabteilung.",

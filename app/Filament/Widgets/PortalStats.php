@@ -4,7 +4,6 @@ namespace App\Filament\Widgets;
 
 use App\Models\ChatMessage;
 use App\Models\FaqQuestion;
-use App\Models\MaterialRequest;
 use App\Models\Setting;
 use App\Models\Suggestion;
 use App\Models\User;
@@ -30,8 +29,8 @@ class PortalStats extends StatsOverviewWidget
             Stat::make('Chat-Nachrichten heute', ChatMessage::whereDate('created_at', today())->count()),
         ];
         if ($admin->isGesamtAdmin()) {
-            $stats[] = Stat::make('Offene Eingänge', Suggestion::where('status', 'new')->count() + MaterialRequest::where('status', 'new')->count() + FaqQuestion::where('status', 'open')->count())
-                ->description('Vorschläge, Materialanfragen, FAQ-Fragen')->color('danger');
+            $stats[] = Stat::make('Offene Eingänge', Suggestion::where('status', 'new')->count() + FaqQuestion::where('status', 'open')->count())
+                ->description('Ideen, FAQ-Fragen')->color('danger');
             $stats[] = $this->cronStat();
         }
 

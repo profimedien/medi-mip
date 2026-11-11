@@ -1,7 +1,7 @@
 <div class="space-y-4">
     <h1 class="text-2xl font-bold">Mitmachen</h1>
     <div class="flex gap-1 overflow-x-auto rounded-xl bg-white p-1 ring-1 ring-black/5">
-        @foreach (['vorschlag' => 'Ideenbörse', 'material' => 'Materialanfrage', 'empfehlung' => 'Mitarbeiter werben'] as $key => $label)
+        @foreach (\App\Livewire\Participation::TABS as $key => $label)
             <button wire:click="$set('tab', '{{ $key }}')" @class(['shrink-0 rounded-lg px-3 py-2 text-sm font-medium', 'bg-medi-blue text-white' => $tab === $key, 'hover:bg-medi-bg' => $tab !== $key])>{{ $label }}</button>
         @endforeach
     </div>
@@ -29,30 +29,19 @@
                 </div>
                 <button class="btn">Idee senden</button>
             </form>
-        @elseif ($tab === 'material')
-            <p class="mb-4 text-sm">Therapiematerial oder Werbemittel anfragen. Die Anfrage geht per E-Mail an die zuständige Stelle, eine Bestellung wird dadurch nicht ausgelöst.</p>
-            <form wire:submit="sendMaterial" class="grid gap-4 sm:grid-cols-2">
-                <div class="sm:col-span-2">
-                    <label class="label">Was wird benötigt?</label>
-                    <input type="text" wire:model="material.item" class="input">
-                    @error('material.item')<p class="mt-1 text-sm text-medi-red">{{ $message }}</p>@enderror
+        @elseif ($tab === 'hilfe')
+            <div class="flex items-start gap-3">
+                <span class="grid size-10 shrink-0 place-items-center rounded-xl bg-medi-blue/10 text-medi-blue"><x-heroicon-o-hand-raised class="size-5" /></span>
+                <div class="min-w-0 text-sm">
+                    <h2 class="mb-1 font-bold text-medi-navy">medi hilft</h2>
+                    @if (filled($helpText))
+                        <div class="whitespace-pre-line break-words">{!! preg_replace('~https?://[^\s<]+~', '<a href="$0" target="_blank" rel="noopener" class="text-medi-sky underline">$0</a>', e($helpText)) !!}</div>
+                    @else
+                        <p>Hier finden Sie bald Informationen und Anträge rund um die Unterstützung durch medi.</p>
+                    @endif
                 </div>
-                <div><label class="label">Menge</label><input type="text" wire:model="material.quantity" class="input"></div>
-                <div>
-                    <label class="label">Bis wann?</label><input type="date" wire:model="material.needed_by" class="input">
-                    @error('material.needed_by')<p class="mt-1 text-sm text-medi-red">{{ $message }}</p>@enderror
-                </div>
-                <div class="sm:col-span-2">
-                    <label class="label">Für welchen Standort?</label>
-                    <select wire:model="material.location_id" class="input">
-                        <option value="">ohne Standort</option>
-                        @foreach ($locations as $loc)<option value="{{ $loc->id }}">{{ $loc->label }}</option>@endforeach
-                    </select>
-                </div>
-                <div class="sm:col-span-2"><label class="label">Anmerkung</label><textarea wire:model="material.note" rows="3" class="input"></textarea></div>
-                <div class="sm:col-span-2"><button class="btn">Anfrage senden</button></div>
-            </form>
-        @else
+            </div>
+        @elseif ($tab === 'empfehlung')
             <div class="prose-medi mb-4 rounded-xl bg-medi-bg p-4 text-sm">{!! nl2br(e($referralText)) !!}</div>
             <form wire:submit="sendReferral" class="grid gap-4 sm:grid-cols-2">
                 <div>

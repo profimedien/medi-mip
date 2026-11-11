@@ -72,7 +72,7 @@ class DemoContentSeeder extends Seeder
         $faqs = [
             'Personal' => [['Wie reiche ich Urlaub ein?', 'Über den Urlaubsantrag im Onboarding-Bereich. Die Freigabe erfolgt durch Ihre Leitung.'], ['Was mache ich bei Krankheit?', 'Bitte am ersten Tag vor Dienstbeginn am Standort melden und die Krankmeldung einreichen.']],
             'IT und Zugänge' => [['Ich habe mein Passwort vergessen', 'Wenden Sie sich an Ihre Standortleitung. Sie erhalten einen neuen Startcode.'], ['Wie installiere ich das Portal als App?', 'Im Browser auf "Zum Home-Bildschirm hinzufügen" tippen. Eine Anleitung finden Sie in Ihrem Profil.']],
-            'Arbeitsplatz' => [['Wo bekomme ich Therapiematerial?', 'Über die Materialanfrage im Bereich Beteiligung.']],
+            'Arbeitsplatz' => [['Wo bekomme ich Therapiematerial?', 'Bitte bei Ihrer Standortleitung.']],
         ];
         $sort = 0;
         foreach ($faqs as $category => $items) {
