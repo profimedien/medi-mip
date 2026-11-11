@@ -1,5 +1,5 @@
 <div class="mx-auto max-w-4xl space-y-4" x-data="{ current: 0, photos: @js($photos->map(fn ($p) => route('media.show', $p))->values()) }">
-    <a href="{{ route('classifieds') }}" wire:navigate class="inline-flex items-center gap-1 text-sm text-medi-sky"><x-heroicon-o-arrow-left class="size-4" /> Alle Kleinanzeigen</a>
+    <a href="{{ route('classifieds') }}" wire:navigate class="inline-flex items-center gap-1 text-sm text-medi-sky"><x-heroicon-o-arrow-left class="size-4" /> Zum Marktplatz</a>
 
     <div class="card grid gap-6 p-0 md:grid-cols-5">
         <div class="md:col-span-3">

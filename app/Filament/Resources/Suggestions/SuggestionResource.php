@@ -42,9 +42,9 @@ class SuggestionResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    protected static ?string $modelLabel = 'Verbesserungsvorschlag';
+    protected static ?string $modelLabel = 'Idee';
 
-    protected static ?string $pluralModelLabel = 'Verbesserungsvorschläge';
+    protected static ?string $pluralModelLabel = 'Ideenbörse';
 
     public static function canCreate(): bool
     {

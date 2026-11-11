@@ -1,7 +1,7 @@
 {
-    "name": "MIP · Mitarbeiter-Informationsportal",
+    "name": "MIP · Mitarbeiterinteraktionsportal",
     "short_name": "MIP",
-    "description": "Mitarbeiter-Informationsportal der medi Gesundheitsgruppe",
+    "description": "Mitarbeiterinteraktionsportal der medi Gesundheitsgruppe",
     "lang": "de",
     "start_url": "/",
     "scope": "/",

@@ -11,7 +11,7 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
-#[Title('Medigram')]
+#[Title('Chat')]
 class Chat extends Component
 {
     use WithFileUploads;

@@ -42,9 +42,9 @@ class ClassifiedResource extends Resource
 
     protected static ?int $navigationSort = 5;
 
-    protected static ?string $modelLabel = 'Kleinanzeige';
+    protected static ?string $modelLabel = 'Anzeige im Marktplatz';
 
-    protected static ?string $pluralModelLabel = 'Kleinanzeigen';
+    protected static ?string $pluralModelLabel = 'Marktplatz';
 
     public static function canCreate(): bool
     {

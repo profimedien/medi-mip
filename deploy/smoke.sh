@@ -12,8 +12,9 @@ CODE=$(curl -s --http1.1 -o /dev/null -w "%{http_code} %{redirect_url}" -c "$JAR
 echo "Login $1: $CODE"
 
 for p in / /news /news/1 /kalender /faq /ansprechpartner /galerien /galerien/1 /organigramm /onboarding \
-         /rueckmeldungen /rueckmeldungen/1 /rueckmeldungen/2 /mitmachen /kleinanzeigen /verzeichnis /verzeichnis/1 \
-         /medigram /medigram/1 /mitteilungen /profil /kleinanzeigen/1 /ansprechpartner/1 "/kleinanzeigen?topic=Verkaufen"; do
+         /rueckmeldungen /rueckmeldungen/1 /rueckmeldungen/2 /mitmachen /marktplatz /verzeichnis /verzeichnis/1 \
+         /chat /chat/1 /mitteilungen /profil /marktplatz/1 /ansprechpartner/1 "/marktplatz?topic=Verkaufen" \
+         /medigram/1 /kleinanzeigen; do
   OUT=$(curl -s --http1.1 -b "$JAR" -w "\n%{http_code}" "$BASE$p")
   STATUS=$(tail -1 <<< "$OUT")
   ERR=$(grep -o -m1 -E '(Internal Server Error|Exception)[^<"]{0,200}' <<< "$OUT")

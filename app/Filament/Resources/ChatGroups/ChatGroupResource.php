@@ -22,7 +22,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
-/** Medigram: automatische Gruppen ansehen, eigene Gruppen anlegen. Direktchats bleiben privat. */
+/** Chat: automatische Gruppen ansehen, eigene Gruppen anlegen. Direktchats bleiben privat. */
 class ChatGroupResource extends Resource
 {
     protected static ?string $model = ChatGroup::class;
@@ -35,7 +35,7 @@ class ChatGroupResource extends Resource
 
     protected static ?string $modelLabel = 'Chatgruppe';
 
-    protected static ?string $pluralModelLabel = 'Medigram-Gruppen';
+    protected static ?string $pluralModelLabel = 'Chatgruppen';
 
     public static function canAccess(): bool
     {

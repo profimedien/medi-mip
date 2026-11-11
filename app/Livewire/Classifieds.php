@@ -8,7 +8,7 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
-#[Title('Kleinanzeigen')]
+#[Title('Marktplatz')]
 class Classifieds extends Component
 {
     use WithFileUploads;

@@ -43,11 +43,11 @@ class Participation extends Component
         $data = $this->validate([
             'suggestion.topic' => ['required', 'string'],
             'suggestion.body' => ['required', 'string', 'min:10', 'max:5000'],
-        ], ['suggestion.topic.required' => 'Bitte ein Thema auswählen.'], ['suggestion.topic' => 'Thema', 'suggestion.body' => 'Vorschlag'])['suggestion'];
+        ], ['suggestion.topic.required' => 'Bitte ein Thema auswählen.'], ['suggestion.topic' => 'Thema', 'suggestion.body' => 'Idee'])['suggestion'];
         Suggestion::create($data + ['user_id' => auth()->id()]);
-        $this->notify('suggestion_recipients', 'Neuer Verbesserungsvorschlag: '.$data['topic'], $data['body'], 'suggestions');
+        $this->notify('suggestion_recipients', 'Neue Idee aus der Ideenbörse: '.$data['topic'], $data['body'], 'suggestions');
         $this->reset('suggestion');
-        $this->done = 'Danke für Ihren Vorschlag! Er ist bei den Zuständigen angekommen.';
+        $this->done = 'Danke für Ihre Idee! Sie ist bei den Zuständigen angekommen.';
     }
 
     public function sendMaterial(): void

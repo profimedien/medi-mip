@@ -47,7 +47,7 @@ class Settings extends Page
         $hint = 'Eine oder mehrere E-Mail-Adressen, mit Komma getrennt.';
 
         return $schema->statePath('data')->components([
-            Section::make('Verbesserungsvorschläge')->schema([
+            Section::make('Ideenbörse')->schema([
                 Textarea::make('suggestion_topics')->label('Themen (eins pro Zeile)')->rows(5),
                 TextInput::make('suggestion_recipients')->label('Empfänger')->helperText($hint),
             ])->columns(2),
@@ -56,7 +56,7 @@ class Settings extends Page
                 TextInput::make('faq_recipients')->label('Eingereichte FAQ-Fragen')->helperText($hint),
                 TextInput::make('referral_recipients')->label('Mitarbeiter werben Mitarbeiter')->helperText($hint),
             ])->columns(3),
-            Section::make('Kleinanzeigen')->schema([
+            Section::make('Marktplatz')->schema([
                 Textarea::make('classified_topics')->label('Kategorien (eine pro Zeile)')->rows(7)
                     ->helperText('Bestehende Anzeigen behalten ihre Kategorie, auch wenn sie hier entfernt wird.'),
             ]),

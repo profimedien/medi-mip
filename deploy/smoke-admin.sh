@@ -14,7 +14,7 @@ curl -s --http1.1 -o /dev/null -c "$JAR" -b "$JAR" -L "$LINK"
 for p in /admin /admin/users /admin/users/create /admin/users/1/edit /admin/posts /admin/posts/create /admin/posts/1/edit \
          /admin/forms /admin/forms/create /admin/forms/1/edit /admin/events /admin/galleries /admin/chat-groups \
          /admin/faqs /admin/faq-categories /admin/faq-questions /admin/contacts /admin/org-units /admin/onboarding-sections \
-         /admin/links /admin/suggestions /admin/material-requests /admin/referrals /admin/classifieds \
+         /admin/links /admin/suggestions /admin/referrals /admin/classifieds \
          /admin/locations /admin/departments /admin/settings /admin/organigramm; do
   OUT=$(curl -s --http1.1 -b "$JAR" -w "\n%{http_code}" "$BASE$p")
   STATUS=$(tail -1 <<< "$OUT")

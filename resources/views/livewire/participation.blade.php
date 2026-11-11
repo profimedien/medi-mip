@@ -1,7 +1,7 @@
 <div class="space-y-4">
     <h1 class="text-2xl font-bold">Mitmachen</h1>
     <div class="flex gap-1 overflow-x-auto rounded-xl bg-white p-1 ring-1 ring-black/5">
-        @foreach (['vorschlag' => 'Verbesserungsvorschlag', 'material' => 'Materialanfrage', 'empfehlung' => 'Mitarbeiter werben'] as $key => $label)
+        @foreach (['vorschlag' => 'Ideenbörse', 'material' => 'Materialanfrage', 'empfehlung' => 'Mitarbeiter werben'] as $key => $label)
             <button wire:click="$set('tab', '{{ $key }}')" @class(['shrink-0 rounded-lg px-3 py-2 text-sm font-medium', 'bg-medi-blue text-white' => $tab === $key, 'hover:bg-medi-bg' => $tab !== $key])>{{ $label }}</button>
         @endforeach
     </div>
@@ -12,7 +12,7 @@
 
     <div class="card max-w-2xl">
         @if ($tab === 'vorschlag')
-            <p class="mb-4 text-sm">Was könnten wir besser machen? Ihr Vorschlag geht direkt an die zuständige Stelle.</p>
+            <p class="mb-4 text-sm">Was könnten wir besser machen? Ihre Idee geht direkt an die zuständige Stelle.</p>
             <form wire:submit="sendSuggestion" class="space-y-4">
                 <div>
                     <label class="label">Thema</label>
@@ -23,11 +23,11 @@
                     @error('suggestion.topic')<p class="mt-1 text-sm text-medi-red">{{ $message }}</p>@enderror
                 </div>
                 <div>
-                    <label class="label">Ihr Vorschlag</label>
+                    <label class="label">Ihre Idee</label>
                     <textarea wire:model="suggestion.body" rows="5" class="input"></textarea>
                     @error('suggestion.body')<p class="mt-1 text-sm text-medi-red">{{ $message }}</p>@enderror
                 </div>
-                <button class="btn">Vorschlag senden</button>
+                <button class="btn">Idee senden</button>
             </form>
         @elseif ($tab === 'material')
             <p class="mb-4 text-sm">Therapiematerial oder Werbemittel anfragen. Die Anfrage geht per E-Mail an die zuständige Stelle, eine Bestellung wird dadurch nicht ausgelöst.</p>

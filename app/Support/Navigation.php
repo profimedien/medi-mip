@@ -13,7 +13,7 @@ class Navigation
     public const ITEMS = [
         ['home', 'Start', 'home', null],
         ['news.index', 'News', 'newspaper', null],
-        ['chat', 'Medigram', 'chat-bubble-left-right', 'chat'],
+        ['chat', 'Chat', 'chat-bubble-left-right', 'chat'],
         ['calendar', 'Kalender', 'calendar-days', null],
         ['forms.index', 'Rückmeldungen', 'clipboard-document-check', 'forms'],
         ['directory.index', 'Verzeichnis', 'users', null],
@@ -21,7 +21,7 @@ class Navigation
         ['faq', 'FAQ und Wissen', 'question-mark-circle', null],
         ['onboarding', 'Onboarding', 'academic-cap', null],
         ['participation', 'Mitmachen', 'light-bulb', null],
-        ['classifieds', 'Kleinanzeigen', 'tag', null],
+        ['classifieds', 'Marktplatz', 'tag', null],
         ['galleries.index', 'Galerien', 'photo', null],
         ['orgchart', 'Organigramm', 'rectangle-group', null],
     ];

@@ -1,6 +1,6 @@
 <div class="space-y-4">
     <div class="flex flex-wrap items-center gap-3">
-        <h1 class="mr-auto text-2xl font-bold">Kleinanzeigen</h1>
+        <h1 class="mr-auto text-2xl font-bold">Marktplatz</h1>
         <div class="flex rounded-xl bg-white p-1 ring-1 ring-black/5">
             @foreach (['' => 'Alle'] + \App\Models\Classified::CATEGORIES as $k => $v)
                 <button wire:click="$set('category', '{{ $k }}')" @class(['rounded-lg px-3 py-1.5 text-sm font-medium', 'bg-medi-blue text-white' => $category === $k, 'hover:bg-medi-bg' => $category !== $k])>{{ $v }}</button>

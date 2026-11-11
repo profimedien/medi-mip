@@ -50,6 +50,16 @@ Route::get('/cron/{secret}', function (string $secret) {
     return response('ok', 200)->header('Content-Type', 'text/plain');
 })->middleware('throttle:10,1')->name('cron');
 
+// Umbenennung 11.11.2026 (Medigram heißt Chat, Kleinanzeigen heißen Marktplatz):
+// alte Adressen dauerhaft weiterleiten, damit Lesezeichen und Links in alten Mitteilungen weiter funktionieren
+foreach (['medigram' => 'chat', 'kleinanzeigen' => 'marktplatz'] as $old => $new) {
+    Route::get('/'.$old.'/{rest?}', function (?string $rest = null) use ($new) {
+        $query = request()->getQueryString();
+
+        return redirect('/'.$new.($rest !== null ? '/'.$rest : '').($query ? '?'.$query : ''), 301);
+    })->where('rest', '[0-9]+');
+}
+
 Route::middleware('guest')->group(function () {
     Route::get('/anmelden', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/anmelden', [AuthController::class, 'login'])->middleware('throttle:300,1'); // Klinik-WLAN: viele Kolleginnen und Kollegen teilen eine IP
@@ -74,11 +84,11 @@ Route::middleware(['auth', 'account.ready'])->group(function () {
     Route::get('/rueckmeldungen', Livewire\Forms\Index::class)->name('forms.index');
     Route::get('/rueckmeldungen/{form}', Livewire\Forms\Show::class)->name('forms.show');
     Route::get('/mitmachen', Livewire\Participation::class)->name('participation');
-    Route::get('/kleinanzeigen', Livewire\Classifieds::class)->name('classifieds');
-    Route::get('/kleinanzeigen/{classified}', Livewire\Classifieds\Show::class)->name('classifieds.show');
+    Route::get('/marktplatz', Livewire\Classifieds::class)->name('classifieds');
+    Route::get('/marktplatz/{classified}', Livewire\Classifieds\Show::class)->name('classifieds.show');
     Route::get('/verzeichnis', Livewire\Directory\Index::class)->name('directory.index');
     Route::get('/verzeichnis/{user}', Livewire\Directory\Show::class)->name('directory.show');
-    Route::get('/medigram/{group?}', Livewire\Chat::class)->name('chat');
+    Route::get('/chat/{group?}', Livewire\Chat::class)->name('chat');
     Route::get('/mitteilungen', Livewire\Notifications::class)->name('notifications');
     Route::get('/profil', Livewire\Profile::class)->name('profile');
 

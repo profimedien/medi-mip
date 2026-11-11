@@ -2,7 +2,7 @@
     {{-- Gruppenliste --}}
     <aside @class(['card flex w-full flex-col p-0 md:w-80 md:shrink-0', 'hidden md:flex' => $group])>
         <div class="flex items-center justify-between border-b border-black/5 p-4">
-            <h1 class="text-xl font-bold">Medigram</h1>
+            <h1 class="text-xl font-bold">Chat</h1>
             <div class="flex items-center gap-1">
                 <button wire:click="openNewChat" class="rounded-lg p-1.5 text-medi-blue hover:bg-medi-bg" title="Neuer Direktchat" aria-label="Neuer Direktchat"><x-heroicon-o-pencil-square class="size-6" /></button>
                 <button wire:click="openNewGroup" class="rounded-lg p-1.5 text-medi-blue hover:bg-medi-bg" title="Neue Gruppe" aria-label="Neue Gruppe"><x-heroicon-o-user-group class="size-6" /></button>

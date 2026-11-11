@@ -32,7 +32,7 @@ class DemoContentSeeder extends Seeder
 
         // News
         $posts = [
-            ['Willkommen im MIP, Ihrem Mitarbeiter-Informationsportal', 'Ab sofort finden Sie hier News, Termine, Ansprechpartner und vieles mehr an einem Ort.', true, false, ['audience_all' => true]],
+            ['Willkommen im MIP, Ihrem Mitarbeiterinteraktionsportal', 'Ab sofort finden Sie hier News, Termine, Ansprechpartner und vieles mehr an einem Ort.', true, false, ['audience_all' => true]],
             ['Neue Hygieneregeln ab November', 'Bitte lesen und bestätigen: Die überarbeiteten Hygieneregeln gelten ab 01.11. an allen Standorten.', false, true, ['audience_all' => true]],
             ['Teambesprechung Physiotherapie', 'Die nächste Fachbereichsbesprechung findet online statt. Einladung folgt im Kalender.', false, false, ['audience_all' => false, 'audience_departments' => [$physio->id]]],
             ['Fürth: Neue Geräte im Trainingsbereich', 'Im Trainingsbereich stehen ab Montag zwei neue Geräte bereit. Einweisung jeweils dienstags.', false, false, ['audience_all' => false, 'audience_locations' => [$fuerth->id]]],
@@ -146,7 +146,7 @@ class DemoContentSeeder extends Seeder
         // Chatgruppen anlegen und mit Beispielnachrichten füllen
         app(ChatGroupSync::class)->run();
         $announcement = ChatGroup::where('type', 'announcement')->first();
-        $this->message($announcement, $admin, 'Herzlich willkommen im Medigram! Hier kommen wichtige Ankündigungen für alle.');
+        $this->message($announcement, $admin, 'Herzlich willkommen im Chat! Hier kommen wichtige Ankündigungen für alle.');
         $fuerthGroup = ChatGroup::where('type', 'location')->where('location_id', $fuerth->id)->first();
         $fuerthAdmin = User::where('username', 'admin.fuerth')->first();
         $this->message($fuerthGroup, $fuerthAdmin, 'Guten Morgen Fürth! Denkt bitte an die Geräteeinweisung am Dienstag.');

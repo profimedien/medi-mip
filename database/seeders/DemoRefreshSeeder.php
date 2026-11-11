@@ -11,8 +11,8 @@ use Illuminate\Database\Seeder;
 
 /**
  * Frischt die Demodaten für Vorführungen auf, ohne den Rest anzufassen (mehrfach ausführbar):
- * Beispiel-Unterhaltungen im Medigram, Geburtstage und Jubiläen im laufenden Monat je Standort,
- * Kategorien der Demo-Kleinanzeigen.
+ * Beispiel-Unterhaltungen im Chat, Geburtstage und Jubiläen im laufenden Monat je Standort,
+ * Kategorien der Demo-Anzeigen im Marktplatz.
  * Testsystem: php84 artisan db:seed --class=DemoRefreshSeeder --force
  */
 class DemoRefreshSeeder extends Seeder
