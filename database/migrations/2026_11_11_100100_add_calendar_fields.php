@@ -21,7 +21,7 @@ return new class extends Migration
         });
 
         // Startfarben für vorhandene Standorte, nur wo noch keine Farbe gesetzt ist
-        $palette = ['#2563eb', '#7c3aed', '#db2777', '#0891b2', '#dc2626', '#1e3a8a', '#92400e', '#c026d3', '#475569', '#ca8a04']; // wie Location::COLORS
+        $palette = ['#2563eb', '#9f1239', '#db2777', '#0891b2', '#dc2626', '#1e3a8a', '#92400e', '#c026d3', '#475569', '#ca8a04']; // wie Location::COLORS
         foreach (DB::table('locations')->whereNull('color')->orderBy('sort')->orderBy('id')->pluck('id')->values() as $i => $id) {
             DB::table('locations')->where('id', $id)->update(['color' => $palette[$i % count($palette)]]);
         }

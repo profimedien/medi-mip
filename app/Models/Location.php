@@ -9,12 +9,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Location extends Model
 {
     /**
-     * Kalenderfarben je Standort. Bewusst ohne Grün und Orange: die stehen für Jubiläen und Geburtstage.
+     * Kalenderfarben je Standort. Bewusst ohne Grün, Orange und Violett: die stehen für Jubiläen, Geburtstage und Fortbildungen.
      * Schlüssel ist der Farbwert, damit er direkt als style genutzt werden kann.
      */
     public const COLORS = [
         '#2563eb' => 'Blau',
-        '#7c3aed' => 'Violett',
+        '#9f1239' => 'Weinrot',
         '#db2777' => 'Pink',
         '#0891b2' => 'Türkis',
         '#dc2626' => 'Rot',

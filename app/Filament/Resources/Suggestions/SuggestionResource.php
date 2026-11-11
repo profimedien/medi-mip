@@ -54,7 +54,7 @@ class SuggestionResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->columns(1)->components([
-            Textarea::make('body')->label('Vorschlag')->disabled(),
+            Textarea::make('body')->label('Idee')->disabled(),
         ]);
     }
 
@@ -64,7 +64,7 @@ class SuggestionResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('topic')->label('Thema')->badge(),
-                TextColumn::make('body')->label('Vorschlag')->wrap()->limit(160)->searchable(),
+                TextColumn::make('body')->label('Idee')->wrap()->limit(160)->searchable(),
                 TextColumn::make('user.last_name')->label('Von')->formatStateUsing(fn ($record) => $record->user?->name),
                 TextColumn::make('created_at')->label('Am')->date('d.m.Y')->sortable(),
                 TextColumn::make('status')->label('Status')->badge()->formatStateUsing(fn ($state) => ['new' => 'Neu', 'in_progress' => 'In Arbeit', 'done' => 'Erledigt'][$state] ?? $state)->color(fn ($state) => ['new' => 'danger', 'in_progress' => 'warning', 'done' => 'success'][$state] ?? 'gray'),

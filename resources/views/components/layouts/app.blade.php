@@ -136,7 +136,7 @@
                 @foreach (Navigation::menuLinks() as $link)
                     <a href="{{ $link->url }}" target="_blank" rel="noopener" @click="menu = false" class="flex items-center gap-2 rounded-xl bg-medi-bg px-3 py-2.5 text-xs font-medium text-medi-navy">
                         <x-heroicon-o-arrow-top-right-on-square class="size-4 shrink-0 text-medi-blue" />
-                        <span class="truncate">{{ $link->title }}</span>
+                        <span class="min-w-0 break-words leading-tight">{{ $link->title }}</span>
                     </a>
                 @endforeach
             </div>
