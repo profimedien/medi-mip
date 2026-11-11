@@ -25,6 +25,7 @@ class CreateUser extends CreateRecord
         if ($this->record->roles()->doesntExist()) {
             $this->record->assignRole('mitarbeiter');
         }
+        $this->record->refresh()->syncLeadershipDepartments();
         app(ChatGroupSync::class)->run();
     }
 

@@ -60,7 +60,7 @@ class UserForm
                         'disabled' => 'Gesperrt',
                     ])->default('invited')->required()->disabledOn('create'),
                     Select::make('roles')->label('Rolle')->relationship('roles', 'name')
-                        ->getOptionLabelFromRecordUsing(fn ($record) => ['gesamt-admin' => 'Gesamt-Admin', 'standort-admin' => 'Standort-Admin', 'abteilungs-admin' => 'Abteilungs-Admin', 'mitarbeiter' => 'Mitarbeiter/in'][$record->name] ?? $record->name)
+                        ->getOptionLabelFromRecordUsing(fn ($record) => User::ROLE_LABELS[$record->name] ?? $record->name)
                         ->preload()->visible($gesamt),
                     Repeater::make('adminScopes')->label('Zuständigkeit als Admin')->relationship()->visible($gesamt)
                         ->addActionLabel('Bereich hinzufügen')->defaultItems(0)
@@ -68,7 +68,7 @@ class UserForm
                             Select::make('location_id')->label('Standort')->options(Location::orderBy('sort')->pluck('short_name', 'id')),
                             Select::make('department_id')->label('oder Abteilung')->options(Department::orderBy('name')->pluck('name', 'id')),
                         ])
-                        ->helperText('Nur für Standort- und Abteilungs-Admins.'),
+                        ->helperText('Für Standort-Admins, Abteilungsleitungen und fachliche Leitungen. Fachliche Leitungen pflegen Inhalte für ihre Abteilungen, verwalten aber keine Mitarbeitenden.'),
                 ]),
                 Section::make('Profil')->schema([
                     Toggle::make('profile_visible')->label('Im Verzeichnis sichtbar'),

@@ -33,6 +33,11 @@ class UserResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'last_name';
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->canManageStaff() ?? false;
+    }
+
     public static function getEloquentQuery(): Builder
     {
         return AdminScope::users(auth()->user());

@@ -12,6 +12,7 @@ class EditUser extends EditRecord
 
     protected function afterSave(): void
     {
+        $this->record->refresh()->syncLeadershipDepartments();
         app(ChatGroupSync::class)->run();
     }
 }

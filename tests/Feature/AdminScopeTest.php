@@ -33,4 +33,20 @@ class AdminScopeTest extends TestCase
         $this->assertFalse($data['audience_all']);
         $this->assertSame([$this->location('Fürth')->id], $data['audience_locations'], 'fremder Standort entfernt, eigener Bereich gesetzt');
     }
+
+    public function test_fachliche_leitung_pflegt_inhalte_aber_keine_mitarbeitenden(): void
+    {
+        $lead = $this->person('Fürth', ['Physiotherapie']);
+        $lead->assignRole('fachliche-leitung');
+        AdminScopeModel::create(['user_id' => $lead->id, 'department_id' => $this->department('Physiotherapie')->id]);
+        $lead = $lead->fresh();
+
+        $this->assertTrue($lead->isAdmin(), 'Zugang zur Redaktion');
+        $this->assertFalse($lead->canManageStaff());
+        $this->actingAs($lead)->get('/admin/users')->assertForbidden();
+        $this->actingAs($lead)->get('/admin/posts')->assertOk();
+
+        $lead->syncLeadershipDepartments();
+        $this->assertContains($this->department('Fachliche Leitungen')->id, $lead->fresh()->departmentIds());
+    }
 }

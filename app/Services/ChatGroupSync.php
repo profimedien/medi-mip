@@ -18,7 +18,8 @@ class ChatGroupSync
     public function run(): void
     {
         $users = User::where('status', '!=', 'disabled')->with('departments:id')->get();
-        $admins = $users->filter->isAdmin()->pluck('id')->all();
+        // Ankündigungskanal: moderiert von Admins mit Personalverantwortung, nicht von fachlichen Leitungen
+        $admins = $users->filter->canManageStaff()->pluck('id')->all();
 
         $announcement = ChatGroup::firstOrCreate(
             ['type' => 'announcement'],

@@ -20,7 +20,7 @@ class AccessSheetController extends Controller
     public function show(Request $request): Response
     {
         $admin = $request->user();
-        abort_unless($admin->isAdmin(), 403);
+        abort_unless($admin->canManageStaff(), 403);
 
         $ids = array_filter(array_map('intval', explode(',', (string) $request->query('ids'))));
         $users = AdminScope::users($admin)->whereIn('id', $ids)->whereNotNull('start_code')->orderBy('last_name')->get();

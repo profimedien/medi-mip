@@ -38,7 +38,7 @@ class StructureSeeder extends Seeder
 
     public function run(): void
     {
-        foreach (['gesamt-admin', 'standort-admin', 'abteilungs-admin', 'mitarbeiter'] as $role) {
+        foreach (['gesamt-admin', 'standort-admin', 'abteilungs-admin', 'fachliche-leitung', 'mitarbeiter'] as $role) {
             Role::findOrCreate($role, 'web');
         }
 

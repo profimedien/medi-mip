@@ -22,7 +22,7 @@ class RedaktionHero extends Widget
             ['label' => 'News schreiben', 'url' => route('filament.admin.resources.posts.create'), 'icon' => 'newspaper'],
             ['label' => 'Rückmeldung anlegen', 'url' => route('filament.admin.resources.forms.create'), 'icon' => 'clipboard-document-check'],
             ['label' => 'Termine', 'url' => route('filament.admin.resources.events.index'), 'icon' => 'calendar-days'],
-            ['label' => 'Person anlegen', 'url' => route('filament.admin.resources.users.create'), 'icon' => 'user-plus'],
+            ...($user->canManageStaff() ? [['label' => 'Person anlegen', 'url' => route('filament.admin.resources.users.create'), 'icon' => 'user-plus']] : []),
             ['label' => 'Zum Portal', 'url' => url('/'), 'icon' => 'arrow-top-right-on-square', 'blank' => true],
         ];
 

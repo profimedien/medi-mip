@@ -24,7 +24,19 @@ class User extends Authenticatable implements FilamentUser, HasMedia, HasName
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasPushSubscriptions, HasRoles, InteractsWithMedia, Notifiable;
 
-    public const ADMIN_ROLES = ['gesamt-admin', 'standort-admin', 'abteilungs-admin'];
+    /** Rollen mit Zugang zur Redaktion. Fachliche Leitung: Inhalte für die eigenen Abteilungen, keine Personalverwaltung */
+    public const ADMIN_ROLES = ['gesamt-admin', 'standort-admin', 'abteilungs-admin', 'fachliche-leitung'];
+
+    /** Rollen, die Mitarbeitende anlegen und verwalten (Personal, Startcodes, Zugangszettel) */
+    public const STAFF_ROLES = ['gesamt-admin', 'standort-admin', 'abteilungs-admin'];
+
+    public const ROLE_LABELS = [
+        'gesamt-admin' => 'Gesamt-Admin',
+        'standort-admin' => 'Standort-Admin',
+        'abteilungs-admin' => 'Abteilungsleitung (Admin)',
+        'fachliche-leitung' => 'Fachliche Leitung',
+        'mitarbeiter' => 'Mitarbeiter/in',
+    ];
 
     protected $guarded = ['id'];
 
@@ -140,6 +152,25 @@ class User extends Authenticatable implements FilamentUser, HasMedia, HasName
     public function isAdmin(): bool
     {
         return $this->hasAnyRole(self::ADMIN_ROLES);
+    }
+
+    /** Darf Mitarbeitende verwalten? Fachliche Leitungen nicht, sie pflegen nur Inhalte ihrer Abteilungen */
+    public function canManageStaff(): bool
+    {
+        return $this->hasAnyRole(self::STAFF_ROLES);
+    }
+
+    /**
+     * Leitungsrollen zusätzlich als Abteilung führen ("Fachliche Leitungen", "Abteilungsleitungen"),
+     * damit Inhalte und Chatgruppen gezielt nur diese Ebene erreichen. Ergänzt nur, entfernt nichts.
+     */
+    public function syncLeadershipDepartments(): void
+    {
+        $map = ['fachliche-leitung' => 'Fachliche Leitungen', 'abteilungs-admin' => 'Abteilungsleitungen'];
+        $names = collect($map)->filter(fn ($dept, $role) => $this->hasRole($role))->values();
+        if ($names->isNotEmpty()) {
+            $this->departments()->syncWithoutDetaching(Department::whereIn('name', $names)->pluck('id'));
+        }
     }
 
     /** Standorte, für die diese Person Admin ist (Gesamt-Admin: alle) */

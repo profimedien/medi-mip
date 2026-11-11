@@ -33,7 +33,7 @@ class UsersTable
                 TextColumn::make('departments.name')->label('Abteilungen')->badge()->limitList(2),
                 TextColumn::make('admin_role')->label('Rolle')->badge()->color('warning')->toggleable()
                     ->state(fn (User $r) => $r->roles->pluck('name')->reject(fn ($n) => $n === 'mitarbeiter')
-                        ->map(fn ($n) => ['gesamt-admin' => 'Gesamt-Admin', 'standort-admin' => 'Standort-Admin', 'abteilungs-admin' => 'Abteilungs-Admin'][$n] ?? $n)->all()),
+                        ->map(fn ($n) => User::ROLE_LABELS[$n] ?? $n)->all()),
                 IconColumn::make('email')->label('E-Mail')->boolean(fn ($state) => filled($state))->state(fn (User $r) => filled($r->email)),
                 TextColumn::make('status')->label('Status')->badge()
                     ->formatStateUsing(fn ($state) => self::STATUS[$state] ?? $state)
