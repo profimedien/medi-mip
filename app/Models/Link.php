@@ -7,4 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Link extends Model
 {
     protected $guarded = ['id'];
+
+    protected $casts = ['in_menu' => 'boolean'];
 }

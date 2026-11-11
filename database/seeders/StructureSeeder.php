@@ -62,7 +62,7 @@ class StructureSeeder extends Seeder
             ['Givve Card', 'https://card.givve.com/login', 'Guthabenkarte'],
             ['medi-Website', 'https://www.medi-ansbach.de', 'Unser Auftritt für Patienten'],
         ] as $i => [$title, $url, $desc]) {
-            Link::updateOrCreate(['title' => $title], ['url' => $url, 'description' => $desc, 'sort' => $i]);
+            Link::updateOrCreate(['title' => $title], ['url' => $url, 'description' => $desc, 'sort' => $i, 'in_menu' => $title !== 'medi-Website']);
         }
 
         foreach ([

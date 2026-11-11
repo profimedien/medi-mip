@@ -51,6 +51,8 @@ class LinkResource extends Resource
             TextInput::make('title')->label('Titel')->required(),
             TextInput::make('url')->label('Adresse')->required()->helperText('z. B. https://… oder # als Platzhalter'),
             TextInput::make('description')->label('Kurzbeschreibung'),
+            Toggle::make('in_menu')->label('Im linken Menü unter Schnellzugriff zeigen')
+                ->helperText('Die Box Schnellzugriff auf der Startseite zeigt weiterhin alle Weiterleitungen.'),
         ]);
     }
 
@@ -61,6 +63,7 @@ class LinkResource extends Resource
             ->columns([
                 TextColumn::make('title')->label('Titel')->weight('medium'),
                 TextColumn::make('url')->label('Adresse')->limit(50),
+                IconColumn::make('in_menu')->label('Im Menü')->boolean(),
             ])
             ->filters([
 

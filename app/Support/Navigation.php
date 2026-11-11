@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\ChatGroup;
 use App\Models\ChatMember;
 use App\Models\Form;
+use App\Models\Link;
 use App\Models\User;
 
 class Navigation
@@ -27,6 +28,12 @@ class Navigation
     ];
 
     public const MOBILE = ['home', 'news.index', 'chat', 'calendar'];
+
+    /** Schnelllinks im Menü: Weiterleitungen, die die Redaktion für das Menü markiert hat */
+    public static function menuLinks()
+    {
+        return once(fn () => Link::where('in_menu', true)->orderBy('sort')->get());
+    }
 
     public static function badges(User $user): array
     {

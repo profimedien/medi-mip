@@ -57,7 +57,22 @@
                     </li>
                 @endforeach
             </ul>
-            <form method="POST" action="{{ route('logout') }}" class="mt-6 border-t border-black/5 pt-4">
+            @if (Navigation::menuLinks()->isNotEmpty())
+                <div class="mt-4 border-t border-black/5 pt-4">
+                    <p class="px-3 pb-1 text-[11px] font-bold uppercase tracking-wide text-medi-gray/70">Schnellzugriff</p>
+                    <ul class="space-y-0.5">
+                        @foreach (Navigation::menuLinks() as $link)
+                            <li>
+                                <a href="{{ $link->url }}" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-medi-gray transition hover:bg-white">
+                                    <x-heroicon-o-arrow-top-right-on-square class="size-5" />
+                                    <span>{{ $link->title }}</span>
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+            <form method="POST" action="{{ route('logout') }}" class="mt-4 border-t border-black/5 pt-4">
                 @csrf
                 <button class="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-medi-gray hover:bg-white">
                     <x-heroicon-o-arrow-left-on-rectangle class="size-5" /> Abmelden
@@ -115,6 +130,17 @@
                 </a>
             @endforeach
         </div>
+        @if (Navigation::menuLinks()->isNotEmpty())
+            <p class="mb-2 mt-5 text-[11px] font-bold uppercase tracking-wide text-medi-gray/70">Schnellzugriff</p>
+            <div class="grid grid-cols-2 gap-2">
+                @foreach (Navigation::menuLinks() as $link)
+                    <a href="{{ $link->url }}" target="_blank" rel="noopener" @click="menu = false" class="flex items-center gap-2 rounded-xl bg-medi-bg px-3 py-2.5 text-xs font-medium text-medi-navy">
+                        <x-heroicon-o-arrow-top-right-on-square class="size-4 shrink-0 text-medi-blue" />
+                        <span class="truncate">{{ $link->title }}</span>
+                    </a>
+                @endforeach
+            </div>
+        @endif
         <div class="mt-4 flex gap-3">
             @if ($user->isAdmin())
                 <a href="/admin" class="btn-ghost flex-1">Redaktion</a>
