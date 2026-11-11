@@ -75,4 +75,14 @@ class ChatTest extends TestCase
         $group = ChatGroup::directBetween($this->person(), $this->person());
         $this->actingAs($this->person())->get(route('chat', $group))->assertForbidden();
     }
+
+    public function test_direktchat_mit_noch_nicht_angemeldeter_person(): void
+    {
+        $a = $this->person();
+        $max = $this->person('Fürth', ['Physiotherapie'], ['first_name' => 'Max', 'last_name' => 'Muster', 'status' => 'invited']);
+
+        Livewire::actingAs($a)->test(Chat::class)->call('openNewChat')->set('personSearch', 'Max')->assertSee('Max Muster');
+        Livewire::actingAs($a)->withQueryParams(['direct' => $max->id])->test(Chat::class)->assertRedirect();
+        $this->assertNotNull(ChatGroup::where('type', 'direct')->whereHas('members', fn ($q) => $q->where('user_id', $max->id))->first());
+    }
 }

@@ -60,8 +60,10 @@ foreach (['medigram' => 'chat', 'kleinanzeigen' => 'marktplatz'] as $old => $new
     })->where('rest', '[0-9]+');
 }
 
+// Anmeldeseite auch für Angemeldete erreichbar: zeigt dann das aktive Konto und bietet den Wechsel an
+Route::get('/anmelden', [AuthController::class, 'showLogin'])->name('login');
+
 Route::middleware('guest')->group(function () {
-    Route::get('/anmelden', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/anmelden', [AuthController::class, 'login'])->middleware('throttle:300,1'); // Klinik-WLAN: viele Kolleginnen und Kollegen teilen eine IP
 });
 

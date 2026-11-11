@@ -15,9 +15,13 @@ use Illuminate\View\View;
 
 class AuthController extends Controller
 {
+    /**
+     * Anmeldeseite. Ist im Browser schon jemand angemeldet, zeigen wir das an, statt still
+     * zur Startseite umzuleiten: sonst landet man beim Kontowechsel immer im alten Konto.
+     */
     public function showLogin(Request $request): View
     {
-        return view('auth.login', ['login' => $request->query('u')]);
+        return view('auth.login', ['login' => $request->query('u'), 'current' => $request->user()]);
     }
 
     /**
@@ -69,7 +73,9 @@ class AuthController extends Controller
 
     public function logout(Request $request): RedirectResponse
     {
-        Auth::logout();
+        // Nur dieses Gerät abmelden. Auth::logout() erneuert das Remember-Token und meldet damit
+        // auch alle anderen Geräte ab (Handy, PWA), die dann wieder das Passwort brauchen.
+        Auth::logoutCurrentDevice();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

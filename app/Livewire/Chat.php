@@ -48,7 +48,8 @@ class Chat extends Component
         $user = auth()->user();
 
         if ($this->direct && $this->direct !== $user->id) {
-            $other = User::where('status', 'active')->findOrFail($this->direct);
+            // auch Kolleginnen und Kollegen, die sich noch nicht angemeldet haben (Status "eingeladen"): Nachricht wartet auf sie
+            $other = User::where('status', '!=', 'disabled')->findOrFail($this->direct);
             $this->redirectRoute('chat', ['group' => ChatGroup::directBetween($user, $other)], navigate: true);
 
             return;
@@ -200,13 +201,13 @@ class Chat extends Component
         }
 
         $people = $this->newChat && strlen($this->personSearch) >= 2
-            ? User::where('status', 'active')->where('id', '!=', $user->id)
+            ? User::where('status', '!=', 'disabled')->where('id', '!=', $user->id)
                 ->where(fn ($q) => $q->where('first_name', 'like', "%{$this->personSearch}%")->orWhere('last_name', 'like', "%{$this->personSearch}%"))
                 ->with('location')->limit(8)->get()
             : collect();
 
         $memberResults = $this->newGroup && strlen($this->memberSearch) >= 2
-            ? User::where('status', 'active')->where('id', '!=', $user->id)->whereNotIn('id', $this->groupMembers)
+            ? User::where('status', '!=', 'disabled')->where('id', '!=', $user->id)->whereNotIn('id', $this->groupMembers)
                 ->where(fn ($q) => $q->where('first_name', 'like', "%{$this->memberSearch}%")->orWhere('last_name', 'like', "%{$this->memberSearch}%"))
                 ->with('location')->limit(6)->get()
             : collect();

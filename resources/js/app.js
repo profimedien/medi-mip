@@ -100,3 +100,17 @@ document.addEventListener('alpine:init', () => {
         },
     }));
 });
+
+// Abgelaufene Sitzung (z. B. Portal am Handy stundenlang im Hintergrund): statt des englischen
+// Livewire-Dialogs "This page has expired" die Seite neu laden. Das Remember-Cookie meldet
+// die Person dabei ohne Passwort wieder an.
+document.addEventListener('livewire:init', () => {
+    window.Livewire.hook('request', ({ fail }) => {
+        fail(({ status, preventDefault }) => {
+            if (status === 419) {
+                preventDefault();
+                window.location.reload();
+            }
+        });
+    });
+});

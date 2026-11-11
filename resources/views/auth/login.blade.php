@@ -1,4 +1,16 @@
 <x-layouts.guest title="Anmelden">
+    @if ($current)
+        <div class="mb-5 rounded-xl bg-medi-bg p-4 text-sm">
+            <p>Sie sind in diesem Browser angemeldet als <strong class="text-medi-navy">{{ $current->name }}</strong>.</p>
+            <div class="mt-3 flex flex-wrap gap-2">
+                <a href="{{ route('home') }}" class="btn">Weiter zum Portal</a>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button class="btn-ghost">Abmelden und anderes Konto nutzen</button>
+                </form>
+            </div>
+        </div>
+    @else
     <h1 class="mb-1 text-xl font-bold">Anmelden</h1>
     <p class="mb-5 text-sm">Mit Benutzername oder E-Mail-Adresse. Beim ersten Mal den Startcode von Ihrem Zugangszettel eingeben.</p>
 
@@ -21,4 +33,5 @@
         <button class="btn w-full">Anmelden</button>
     </form>
     <p class="mt-5 text-center text-xs text-medi-gray/80">Passwort vergessen? Ihre Standortleitung erstellt Ihnen einen neuen Startcode.</p>
+    @endif
 </x-layouts.guest>

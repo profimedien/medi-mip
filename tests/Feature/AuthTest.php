@@ -68,4 +68,17 @@ class AuthTest extends TestCase
         $admin->assignRole('standort-admin');
         $this->actingAs($admin)->get('/admin')->assertOk();
     }
+
+    public function test_abmelden_laesst_andere_geraete_angemeldet(): void
+    {
+        $user = $this->person('Fürth', ['Physiotherapie'], ['remember_token' => 'token-handy']);
+        $this->actingAs($user)->post(route('logout'))->assertRedirect(route('login'));
+        $this->assertSame('token-handy', $user->fresh()->remember_token, 'Remember-Token der anderen Geräte bleibt gültig');
+    }
+
+    public function test_anmeldeseite_zeigt_aktives_konto_statt_umleitung(): void
+    {
+        $user = $this->person('Fürth', ['Physiotherapie'], ['first_name' => 'Anna', 'last_name' => 'Beispiel']);
+        $this->actingAs($user)->get(route('login'))->assertOk()->assertSee('angemeldet als')->assertSee('Anna Beispiel');
+    }
 }
