@@ -20,7 +20,7 @@ class ChatGroup extends Model
 
     protected $guarded = ['id'];
 
-    protected $casts = ['read_only' => 'boolean', 'members_can_invite' => 'boolean', 'last_message_at' => 'datetime'];
+    protected $casts = ['read_only' => 'boolean', 'members_can_invite' => 'boolean', 'history_for_new_members' => 'boolean', 'last_message_at' => 'datetime'];
 
     public function members(): HasMany
     {
@@ -76,6 +76,39 @@ class ChatGroup extends Model
         $member = $this->membership($user);
 
         return ($member && ($member->is_moderator || $this->members_can_invite)) || $user->isGesamtAdmin();
+    }
+
+    /** Moderation einer eigenen Gruppe: Ersteller bzw. Moderatoren und Gesamt-Admin */
+    public function canModerate(User $user): bool
+    {
+        return $this->type === 'custom' && ($this->membership($user)?->is_moderator || $user->isGesamtAdmin());
+    }
+
+    /** Mitglieder entfernen darf nur die Moderation, sich selbst nicht (dafür: Verlassen) */
+    public function canRemoveMember(User $user, ChatMember $member): bool
+    {
+        return $member->user_id !== $user->id && $this->canModerate($user);
+    }
+
+    /**
+     * Nachträglich hinzufügen. Ohne Verlauf sieht die Person nur Nachrichten ab jetzt,
+     * und ältere Nachrichten zählen nicht als ungelesen.
+     */
+    public function addMember(User $person): ChatMember
+    {
+        $lastId = $this->history_for_new_members ? 0 : (int) $this->messages()->max('id');
+
+        return $this->members()->create([
+            'user_id' => $person->id,
+            'visible_from_message_id' => $lastId,
+            'last_read_message_id' => $lastId,
+        ]);
+    }
+
+    /** Nachrichten, die diese Person sehen darf (Verlauf-Grenze bei nachträglichem Beitritt) */
+    public function visibleMessagesFor(User $user)
+    {
+        return $this->messages()->where('id', '>', $this->membership($user)?->visible_from_message_id ?? 0);
     }
 
     /** Anzeigename; bei Direktchats der Name des Gegenübers */

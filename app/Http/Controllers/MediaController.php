@@ -25,7 +25,8 @@ class MediaController extends Controller
         $allowed = match (true) {
             $model === null => false,
             // Chat-Anhänge nur für Mitglieder der Gruppe, auch Admins sehen keine fremden Chats
-            $model instanceof ChatMessage => $model->group->members()->where('user_id', $user->id)->exists(),
+            $model instanceof ChatMessage => $model->group->members()->where('user_id', $user->id)
+                ->where('visible_from_message_id', '<', $model->id)->exists(), // ohne Verlauf: keine älteren Anhänge
             $user->canManageStaff() => true,
             $model instanceof Post, $model instanceof Gallery, $model instanceof Form, $model instanceof Event => $model->isVisibleTo($user),
             default => true, // Profile, Kleinanzeigen, Onboarding: für alle Angemeldeten

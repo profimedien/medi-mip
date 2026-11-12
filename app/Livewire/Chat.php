@@ -39,6 +39,10 @@ class Chat extends Component
 
     public bool $membersCanInvite = false;
 
+    public bool $historyForNewMembers = true;
+
+    public bool $showMembers = false;
+
     public string $search = '';
 
     public bool $inviting = false;
@@ -165,7 +169,7 @@ class Chat extends Component
             'groupMembers.*' => ['integer', 'exists:users,id'],
         ], ['groupMembers.required' => 'Bitte mindestens eine Person hinzufügen.'], ['groupName' => 'Gruppenname']);
 
-        $group = ChatGroup::create(['type' => 'custom', 'name' => $this->groupName, 'members_can_invite' => $this->membersCanInvite, 'last_message_at' => now()]);
+        $group = ChatGroup::create(['type' => 'custom', 'name' => $this->groupName, 'members_can_invite' => $this->membersCanInvite, 'history_for_new_members' => $this->historyForNewMembers, 'last_message_at' => now()]);
         ChatMember::create(['chat_group_id' => $group->id, 'user_id' => auth()->id(), 'is_moderator' => true]);
         foreach (array_unique($this->groupMembers) as $id) {
             if ($id !== auth()->id()) {
@@ -173,7 +177,7 @@ class Chat extends Component
             }
         }
         ChatMessage::create(['chat_group_id' => $group->id, 'user_id' => auth()->id(), 'body' => auth()->user()->first_name.' hat die Gruppe „'.$this->groupName.'“ erstellt.']);
-        $this->reset('newGroup', 'groupName', 'groupMembers', 'memberSearch', 'membersCanInvite');
+        $this->reset('newGroup', 'groupName', 'groupMembers', 'memberSearch', 'membersCanInvite', 'historyForNewMembers');
 
         return $this->redirectRoute('chat', ['group' => $group], navigate: true);
     }
@@ -192,7 +196,7 @@ class Chat extends Component
         abort_unless($this->group?->canInvite($user), 403);
         $person = User::where('status', '!=', 'disabled')->findOrFail($id);
         if (! $this->group->members()->where('user_id', $person->id)->exists()) {
-            ChatMember::create(['chat_group_id' => $this->group->id, 'user_id' => $person->id]);
+            $this->group->addMember($person);
             ChatMessage::create(['chat_group_id' => $this->group->id, 'user_id' => $user->id,
                 'body' => $user->first_name.' hat '.$person->name.' zur Gruppe hinzugefügt.']);
             $this->group->update(['last_message_at' => now()]);
@@ -207,6 +211,30 @@ class Chat extends Component
         abort_unless($this->group && $this->group->type === 'custom'
             && ($this->group->membership($user)?->is_moderator || $user->isGesamtAdmin()), 403);
         $this->group->update(['members_can_invite' => ! $this->group->members_can_invite]);
+    }
+
+    /** Nur die Moderation legt fest, ob nachträglich Hinzugefügte den bisherigen Verlauf sehen */
+    public function toggleHistoryForNewMembers(): void
+    {
+        abort_unless($this->group?->canModerate(auth()->user()), 403);
+        $this->group->update(['history_for_new_members' => ! $this->group->history_for_new_members]);
+    }
+
+    public function toggleMembers(): void
+    {
+        $this->showMembers = ! $this->showMembers;
+    }
+
+    /** Mitglied aus einer eigenen Gruppe entfernen (nur Moderation) */
+    public function removeFromGroup(int $userId): void
+    {
+        $user = auth()->user();
+        $member = $this->group?->members()->where('user_id', $userId)->with('user')->firstOrFail();
+        abort_unless($member && $this->group->canRemoveMember($user, $member), 403);
+        $member->delete();
+        ChatMessage::create(['chat_group_id' => $this->group->id, 'user_id' => $user->id,
+            'body' => $user->first_name.' hat '.$member->user->name.' aus der Gruppe entfernt.']);
+        $this->group->update(['last_message_at' => now()]);
     }
 
     public function leaveGroup()
@@ -238,15 +266,19 @@ class Chat extends Component
         $foundMessages = collect();
         if (mb_strlen($term) >= 2) {
             $needle = mb_strtolower($term);
-            $foundMessages = ChatMessage::whereIn('chat_group_id', $groups->pluck('id'))->whereNull('deleted_at')
-                ->where('body', 'like', '%'.addcslashes($term, '%_\\').'%')
-                ->with('user', 'group.users')->latest('id')->limit(30)->get();
+            $foundMessages = ChatMessage::query()
+                ->join('chat_members as cm', fn ($j) => $j->on('cm.chat_group_id', '=', 'chat_messages.chat_group_id')->where('cm.user_id', $user->id))
+                ->whereColumn('chat_messages.id', '>', 'cm.visible_from_message_id')
+                ->select('chat_messages.*')
+                ->whereNull('chat_messages.deleted_at')
+                ->where('chat_messages.body', 'like', '%'.addcslashes($term, '%_\\').'%')
+                ->with('user', 'group.users')->latest('chat_messages.id')->limit(30)->get();
             $groups = $groups->filter(fn (ChatGroup $g) => str_contains(mb_strtolower($g->titleFor($user)), $needle))->values();
         }
 
         $messages = collect();
         if ($this->group) {
-            $messages = $this->group->messages()->with('user', 'media')->latest('id')->limit($this->limit)->get()->reverse()->values();
+            $messages = $this->group->visibleMessagesFor($user)->with('user', 'media')->latest('id')->limit($this->limit)->get()->reverse()->values();
             $this->markRead();
         }
 
@@ -272,6 +304,8 @@ class Chat extends Component
             'foundMessages' => $foundMessages,
             'inviteResults' => $inviteResults,
             'canInvite' => $this->group?->canInvite($user) ?? false,
+            'canModerate' => $this->group?->canModerate($user) ?? false,
+            'memberList' => $this->showMembers && $this->group ? $this->group->members()->with('user.location')->get()->sortBy(fn ($m) => [! $m->is_moderator, $m->user->last_name])->values() : collect(),
             'memberResults' => $memberResults,
             'selectedMembers' => User::whereIn('id', $this->groupMembers)->get(),
             'groups' => $groups,

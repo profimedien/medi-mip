@@ -42,6 +42,10 @@
                     <input type="checkbox" wire:model="membersCanInvite" class="mt-0.5 rounded text-medi-blue">
                     <span>Alle Mitglieder dürfen weitere Personen hinzufügen. Sonst nur Sie als Gruppen-Admin.</span>
                 </label>
+                <label class="flex items-start gap-2 text-xs">
+                    <input type="checkbox" wire:model="historyForNewMembers" class="mt-0.5 rounded text-medi-blue">
+                    <span>Später Hinzugefügte sehen den bisherigen Verlauf. Sonst nur Nachrichten ab ihrem Beitritt.</span>
+                </label>
                 <div class="flex gap-2">
                     <button class="btn flex-1">Gruppe erstellen</button>
                     <button type="button" wire:click="$set('newGroup', false)" class="btn-ghost">Abbrechen</button>
@@ -118,7 +122,14 @@
                             @endif
                         </h2>
                     @endif
-                    <p class="text-xs">{{ $group->type === 'direct' ? 'Direktchat' : $group->members->count().' Mitglieder' }}{{ $group->read_only ? ' · nur Moderation schreibt' : '' }}</p>
+                    <p class="text-xs">
+                        @if ($group->type === 'direct')
+                            Direktchat
+                        @else
+                            <button type="button" wire:click="toggleMembers" class="underline decoration-dotted underline-offset-2 hover:text-medi-blue" title="Mitglieder anzeigen">{{ $group->members->count() }} Mitglieder</button>
+                        @endif
+                        {{ $group->read_only ? ' · nur Moderation schreibt' : '' }}
+                    </p>
                 </div>
                 @if ($canInvite)
                     <button wire:click="openInvite" class="rounded-lg p-1.5 text-medi-blue hover:bg-medi-bg" title="Personen hinzufügen" aria-label="Personen hinzufügen"><x-heroicon-o-user-plus class="size-5" /></button>
@@ -142,6 +153,30 @@
                             Alle Mitglieder dürfen Personen hinzufügen
                         </label>
                     @endif
+                    @if ($canModerate)
+                        <label class="flex items-center gap-2 text-xs">
+                            <input type="checkbox" wire:click="toggleHistoryForNewMembers" @checked($group->history_for_new_members) class="rounded text-medi-blue">
+                            Neu Hinzugefügte sehen den bisherigen Verlauf
+                        </label>
+                    @endif
+                </div>
+            @endif
+            @if ($showMembers && $group->type !== 'direct')
+                <div class="max-h-64 space-y-1 overflow-y-auto border-b border-black/5 bg-medi-bg/50 p-3">
+                    @foreach ($memberList as $member)
+                        <div class="flex items-center gap-2 rounded-lg p-1.5 text-sm" wire:key="member-{{ $member->id }}">
+                            <x-avatar :user="$member->user" class="size-7 text-[10px]" />
+                            <span class="min-w-0 truncate">{{ $member->user->name }}</span>
+                            <span class="text-xs">{{ $member->user->location?->label }}</span>
+                            @if ($member->is_moderator)<span class="badge">Moderation</span>@endif
+                            @if ($group->canRemoveMember(auth()->user(), $member))
+                                <button type="button" x-on:click="$store.confirm.ask(@js($member->user->name.' aus der Gruppe entfernen?'), () => $wire.removeFromGroup({{ $member->user_id }}), 'Entfernen')"
+                                        class="ml-auto rounded-lg p-1 text-medi-gray hover:bg-white hover:text-medi-red" title="Aus der Gruppe entfernen" aria-label="{{ $member->user->name }} entfernen">
+                                    <x-heroicon-o-user-minus class="size-4" />
+                                </button>
+                            @endif
+                        </div>
+                    @endforeach
                 </div>
             @endif
 

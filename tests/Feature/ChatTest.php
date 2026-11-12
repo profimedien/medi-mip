@@ -115,4 +115,57 @@ class ChatTest extends TestCase
         Livewire::actingAs($a)->test(Chat::class)->set('search', 'Dienstplan')
             ->assertSee('Dienstplan Dezember ist fertig')->assertDontSee('Dienstplan geheim');
     }
+
+    public function test_moderation_entfernt_mitglieder(): void
+    {
+        $owner = $this->person();
+        $member = $this->person();
+        $other = $this->person();
+        $group = ChatGroup::create(['type' => 'custom', 'name' => 'Lauftreff', 'members_can_invite' => true]);
+        $group->members()->createMany([['user_id' => $owner->id, 'is_moderator' => true], ['user_id' => $member->id], ['user_id' => $other->id]]);
+
+        // Einladen dürfen alle, entfernen trotzdem nur die Moderation
+        Livewire::actingAs($member)->test(Chat::class, ['group' => $group])->call('removeFromGroup', $other->id)->assertForbidden();
+        Livewire::actingAs($owner)->test(Chat::class, ['group' => $group])->call('removeFromGroup', $owner->id)->assertForbidden();
+        Livewire::actingAs($owner)->test(Chat::class, ['group' => $group])->call('removeFromGroup', $other->id);
+        $this->assertNull($group->fresh()->membership($other));
+        $this->assertTrue($group->messages()->where('body', 'like', '%aus der Gruppe entfernt%')->exists());
+        Livewire::actingAs($other)->test(Chat::class, ['group' => $group->fresh()])->assertForbidden();
+    }
+
+    public function test_ohne_verlauf_sehen_neue_mitglieder_nur_neue_nachrichten(): void
+    {
+        $owner = $this->person();
+        $guest = $this->person();
+        $group = ChatGroup::create(['type' => 'custom', 'name' => 'Projekt']);
+        $member = $this->person();
+        $group->members()->createMany([['user_id' => $owner->id, 'is_moderator' => true], ['user_id' => $member->id]]);
+        ChatMessage::create(['chat_group_id' => $group->id, 'user_id' => $owner->id, 'body' => 'Alte Planung vertraulich']);
+
+        Livewire::actingAs($member)->test(Chat::class, ['group' => $group])->call('toggleHistoryForNewMembers')->assertForbidden();
+        Livewire::actingAs($owner)->test(Chat::class, ['group' => $group])->call('toggleHistoryForNewMembers');
+        $this->assertFalse($group->fresh()->history_for_new_members);
+
+        Livewire::actingAs($owner)->test(Chat::class, ['group' => $group->fresh()])->call('invite', $guest->id);
+        ChatMessage::create(['chat_group_id' => $group->id, 'user_id' => $owner->id, 'body' => 'Willkommen im Projekt']);
+
+        $group = $group->fresh();
+        $this->assertSame(1, $group->unreadCountFor($guest), 'alte Nachrichten zählen nicht als ungelesen');
+        Livewire::actingAs($guest)->test(Chat::class, ['group' => $group])
+            ->assertSee('Willkommen im Projekt')->assertDontSee('Alte Planung vertraulich');
+        Livewire::actingAs($guest)->test(Chat::class)->set('search', 'Planung')->assertDontSee('Alte Planung vertraulich');
+    }
+
+    public function test_mit_verlauf_sehen_neue_mitglieder_alles(): void
+    {
+        $owner = $this->person();
+        $guest = $this->person();
+        $group = ChatGroup::create(['type' => 'custom', 'name' => 'Projekt']);
+        $this->assertTrue($group->fresh()->history_for_new_members, 'Standard: Verlauf sichtbar');
+        $group->members()->create(['user_id' => $owner->id, 'is_moderator' => true]);
+        ChatMessage::create(['chat_group_id' => $group->id, 'user_id' => $owner->id, 'body' => 'Alte Planung offen']);
+        Livewire::actingAs($owner)->test(Chat::class, ['group' => $group->fresh()])->call('invite', $guest->id);
+
+        Livewire::actingAs($guest)->test(Chat::class, ['group' => $group->fresh()])->assertSee('Alte Planung offen');
+    }
 }
