@@ -39,4 +39,12 @@ class ImportAndClassifiedsTest extends TestCase
         Classified::create(['user_id' => $user->id, 'category' => 'private', 'title' => 'neu', 'body' => 'x', 'expires_at' => now()->addDay()]);
         $this->assertSame(['neu'], Classified::running()->pluck('title')->all());
     }
+
+    public function test_marktplatz_startet_mit_dienstlich(): void
+    {
+        $this->actingAs($this->person());
+        \Livewire\Livewire::test(\App\Livewire\Classifieds::class)
+            ->assertSet('category', 'business')
+            ->assertSet('ad.category', 'business');
+    }
 }

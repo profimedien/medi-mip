@@ -14,7 +14,7 @@ class Classifieds extends Component
     use WithFileUploads;
 
     #[Url]
-    public string $category = '';
+    public string $category = 'business'; // Marktplatz startet mit dienstlichen Anzeigen, "Alle" bleibt wählbar
 
     #[Url]
     public string $topic = '';
