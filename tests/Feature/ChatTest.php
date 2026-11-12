@@ -150,7 +150,7 @@ class ChatTest extends TestCase
         ChatMessage::create(['chat_group_id' => $group->id, 'user_id' => $owner->id, 'body' => 'Willkommen im Projekt']);
 
         $group = $group->fresh();
-        $this->assertSame(1, $group->unreadCountFor($guest), 'alte Nachrichten zählen nicht als ungelesen');
+        $this->assertSame(2, $group->unreadCountFor($guest), 'nur Hinweis "hinzugefügt" und Willkommen, alte Nachrichten zählen nicht');
         Livewire::actingAs($guest)->test(Chat::class, ['group' => $group])
             ->assertSee('Willkommen im Projekt')->assertDontSee('Alte Planung vertraulich');
         Livewire::actingAs($guest)->test(Chat::class)->set('search', 'Planung')->assertDontSee('Alte Planung vertraulich');
