@@ -32,7 +32,7 @@ class Navigation
     /** Schnelllinks im Menü: Weiterleitungen, die die Redaktion für das Menü markiert hat */
     public static function menuLinks()
     {
-        return once(fn () => Link::where('in_menu', true)->orderBy('sort')->get());
+        return once(fn () => Link::category('schnellzugriff')->where('in_menu', true)->orderBy('sort')->get());
     }
 
     public static function badges(User $user): array

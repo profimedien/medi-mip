@@ -7,7 +7,7 @@
             @endforeach
         </div>
         <select wire:model.live="location" class="input w-full sm:w-64">
-            <option value="">Alle Standorte</option>
+            <option value="alle">Alle Einrichtungen</option>
             @foreach ($locations as $loc)
                 <option value="{{ $loc->id }}">{{ $loc->label }}</option>
             @endforeach
@@ -25,13 +25,18 @@
                     <span class="min-w-0">
                         <span class="block font-bold text-medi-navy">{{ $contact->name }}</span>
                         <span class="block text-sm">{{ $contact->responsibility }}</span>
+                        @if ($contact->contact_person)<span class="block text-sm text-medi-gray">{{ $contact->contact_person }}</span>@endif
                     </span>
                     <x-heroicon-o-chevron-right class="ml-auto size-5 shrink-0 text-medi-gray/50" />
                 </a>
-                @if ($contact->location || $contact->type === 'external')
+                @if ($contact->locations->isNotEmpty() || $contact->type === 'external')
                     <div class="mt-1 flex flex-wrap gap-1">
                         @if ($contact->type === 'external')<span class="badge">Extern</span>@endif
-                        @if ($contact->location)<span class="badge">{{ $contact->location->label }}</span>@endif
+                        @if ($contact->locations->count() > 2)
+                            <span class="badge" title="{{ $contact->locations->pluck('label')->join(', ') }}">{{ $contact->locations->count() }} Einrichtungen</span>
+                        @else
+                            @foreach ($contact->locations as $loc)<span class="badge">{{ $loc->label }}</span>@endforeach
+                        @endif
                     </div>
                 @endif
                 <div class="mt-3 flex flex-wrap gap-2">

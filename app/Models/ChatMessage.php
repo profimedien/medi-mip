@@ -14,7 +14,8 @@ class ChatMessage extends Model implements HasMedia
 
     protected $guarded = ['id'];
 
-    protected $casts = ['deleted_at' => 'datetime'];
+    // Text verschlüsselt in der Datenbank (AES-256 mit APP_KEY). Suche daher nicht per SQL, sondern nach dem Entschlüsseln
+    protected $casts = ['deleted_at' => 'datetime', 'body' => 'encrypted'];
 
     public function group(): BelongsTo
     {

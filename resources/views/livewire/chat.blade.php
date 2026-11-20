@@ -4,10 +4,26 @@
         <div class="flex items-center justify-between border-b border-black/5 p-4">
             <h1 class="text-xl font-bold">Chat</h1>
             <div class="flex items-center gap-1">
+                @if (filled($chatRules))
+                    <button wire:click="toggleRules" class="rounded-lg p-1.5 text-medi-blue hover:bg-medi-bg" title="Chatregeln" aria-label="Chatregeln"><x-heroicon-o-scale class="size-6" /></button>
+                @endif
                 <button wire:click="openNewChat" class="rounded-lg p-1.5 text-medi-blue hover:bg-medi-bg" title="Neuer Direktchat" aria-label="Neuer Direktchat"><x-heroicon-o-pencil-square class="size-6" /></button>
                 <button wire:click="openNewGroup" class="rounded-lg p-1.5 text-medi-blue hover:bg-medi-bg" title="Neue Gruppe" aria-label="Neue Gruppe"><x-heroicon-o-user-group class="size-6" /></button>
             </div>
         </div>
+        @if ($showRules && filled($chatRules))
+            <div class="border-b border-black/5 bg-medi-bg/50 p-4 text-sm">
+                <p class="mb-2 font-bold text-medi-navy">Chatregeln</p>
+                <div class="max-h-64 overflow-y-auto whitespace-pre-line break-words">{!! preg_replace('~https?://[^\s<]+~', '<a href="$0" target="_blank" rel="noopener" class="text-medi-sky underline">$0</a>', e($chatRules)) !!}</div>
+                <div class="mt-3 flex gap-2">
+                    @if (! auth()->user()->chat_rules_seen_at)
+                        <button wire:click="acceptRules" class="btn flex-1">Gelesen</button>
+                    @else
+                        <button wire:click="toggleRules" class="btn-ghost flex-1">Schließen</button>
+                    @endif
+                </div>
+            </div>
+        @endif
         <div class="border-b border-black/5 p-3">
             <input type="search" wire:model.live.debounce.300ms="search" class="input py-2" placeholder="Gruppen und Nachrichten durchsuchen" aria-label="Chat durchsuchen">
         </div>
@@ -129,6 +145,7 @@
                             <button type="button" wire:click="toggleMembers" class="underline decoration-dotted underline-offset-2 hover:text-medi-blue" title="Mitglieder anzeigen">{{ $group->members->count() }} Mitglieder</button>
                         @endif
                         {{ $group->read_only ? ' · nur Moderation schreibt' : '' }}
+                        {{ $retentionDays ? ' · Nachrichten werden nach '.$retentionDays.' Tagen gelöscht' : '' }}
                     </p>
                 </div>
                 @if ($canInvite)
@@ -219,10 +236,12 @@
                     @error('body')<p class="mb-1 text-xs text-medi-red">{{ $message }}</p>@enderror
                     @error('upload')<p class="mb-1 text-xs text-medi-red">{{ $message }}</p>@enderror
                     <div class="flex items-end gap-2">
-                        <label class="cursor-pointer rounded-xl p-2.5 text-medi-gray hover:bg-medi-bg" aria-label="Datei anhängen">
-                            <x-heroicon-o-paper-clip class="size-5" />
-                            <input type="file" wire:model="upload" class="sr-only">
-                        </label>
+                        @if ($uploadsAllowed)
+                            <label class="cursor-pointer rounded-xl p-2.5 text-medi-gray hover:bg-medi-bg" aria-label="Datei anhängen">
+                                <x-heroicon-o-paper-clip class="size-5" />
+                                <input type="file" wire:model="upload" class="sr-only">
+                            </label>
+                        @endif
                         <textarea wire:model="body" rows="1" class="input max-h-32 min-h-11 resize-none" placeholder="Nachricht schreiben"
                                   @keydown.enter="if (!$event.shiftKey && window.innerWidth > 768) { $event.preventDefault(); $wire.send() }"></textarea>
                         <button class="btn px-3" aria-label="Senden" wire:loading.attr="disabled"><x-heroicon-o-paper-airplane class="size-5" /></button>

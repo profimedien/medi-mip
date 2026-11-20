@@ -21,10 +21,11 @@ class ManageChatGroups extends ManageRecords
                 ->action(function () {
                     app(ChatGroupSync::class)->run();
                     Notification::make()->title('Gruppen abgeglichen')->success()->send();
-                }),
+                })->visible(fn () => ChatGroupResource::canManage()),
             Action::make('create')->label('Gruppe anlegen')->icon('heroicon-o-plus')
                 ->schema(fn (Schema $schema) => ChatGroupResource::form($schema))
-                ->action(fn (array $data) => ChatGroupResource::saveGroup(new ChatGroup(['type' => 'custom']), $data)),
+                ->action(fn (array $data) => ChatGroupResource::saveGroup(new ChatGroup(['type' => 'custom']), $data))
+                ->visible(fn () => ChatGroupResource::canManage()),
         ];
     }
 }

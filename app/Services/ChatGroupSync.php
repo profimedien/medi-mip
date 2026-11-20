@@ -47,11 +47,15 @@ class ChatGroupSync
         }
     }
 
+    /**
+     * Moderation einer Standort- bzw. Abteilungsgruppe: nur die dafür zuständigen Admins.
+     * Gesamt-Admins sind seit 20.11.2026 nicht mehr automatisch in allen Gruppen (lesen sonst überall mit),
+     * sie bleiben Moderation des Ankündigungskanals und Mitglied ihrer eigenen Standort-/Abteilungsgruppen.
+     */
     private function scopedAdmins(?int $location = null, ?int $department = null): array
     {
-        return User::role('gesamt-admin')->pluck('id')
-            ->merge(User::whereHas('adminScopes', fn ($q) => $location ? $q->where('location_id', $location) : $q->where('department_id', $department))->pluck('id'))
-            ->unique()->all();
+        return User::whereHas('adminScopes', fn ($q) => $location ? $q->where('location_id', $location) : $q->where('department_id', $department))
+            ->pluck('id')->unique()->all();
     }
 
     private function syncMembers(ChatGroup $group, array $userIds, array $moderatorIds): void

@@ -129,7 +129,7 @@ class ChatTest extends TestCase
         Livewire::actingAs($owner)->test(Chat::class, ['group' => $group])->call('removeFromGroup', $owner->id)->assertForbidden();
         Livewire::actingAs($owner)->test(Chat::class, ['group' => $group])->call('removeFromGroup', $other->id);
         $this->assertNull($group->fresh()->membership($other));
-        $this->assertTrue($group->messages()->where('body', 'like', '%aus der Gruppe entfernt%')->exists());
+        $this->assertTrue($group->messages()->get()->contains(fn ($m) => str_contains((string) $m->body, 'aus der Gruppe entfernt'))); // Text ist verschlüsselt, kein SQL-LIKE
         Livewire::actingAs($other)->test(Chat::class, ['group' => $group->fresh()])->assertForbidden();
     }
 

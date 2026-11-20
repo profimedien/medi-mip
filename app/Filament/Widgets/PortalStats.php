@@ -14,6 +14,12 @@ use Illuminate\Support\Carbon;
 
 class PortalStats extends StatsOverviewWidget
 {
+    // nicht für die reine Chat-Übersicht
+    public static function canView(): bool
+    {
+        return auth()->user()?->isAdmin() ?? false;
+    }
+
     protected static ?int $sort = 1;
 
     protected ?string $heading = null;

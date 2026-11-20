@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\FaqCategory;
 use App\Models\FaqQuestion;
+use App\Models\Link;
 use App\Notifications\InboxNotification;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Notification;
@@ -36,6 +37,9 @@ class FaqPage extends Component
             ->when($term, fn ($q) => $q->where(fn ($q) => $q->where('question', 'like', "%$term%")->orWhere('answer', 'like', "%$term%")))])
             ->get()->filter(fn ($c) => $c->faqs->isNotEmpty());
 
-        return view('livewire.faq', ['categories' => $categories]);
+        return view('livewire.faq', [
+            'categories' => $categories,
+            'laws' => Link::category('gesetze')->orderBy('sort')->get(),
+        ]);
     }
 }

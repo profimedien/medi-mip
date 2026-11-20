@@ -89,8 +89,9 @@ class DemoContentSeeder extends Seeder
             ['IT-Ansprechpartner', 'Zugänge, Geräte, Portal', null],
             ['Standortleitung Fürth', 'Alles rund um den Standort Fürth', $fuerth->id],
         ] as $i => [$resp, $desc, $loc]) {
-            Contact::create(['name' => fake('de_DE')->name(), 'responsibility' => $resp.' · '.$desc, 'location_id' => $loc,
-                'phone' => '0981 '.fake()->numberBetween(10000, 99999), 'email' => 'beispiel'.$i.'@example.org', 'sort' => $i]);
+            Contact::create(['name' => fake('de_DE')->name(), 'responsibility' => $resp.' · '.$desc,
+                'phone' => '0981 '.fake()->numberBetween(10000, 99999), 'email' => 'beispiel'.$i.'@example.org', 'sort' => $i])
+                ->locations()->sync(array_filter([$loc]));
         }
 
         // Organigramm (Beispielstruktur)

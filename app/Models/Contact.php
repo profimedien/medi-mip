@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -23,9 +25,17 @@ class Contact extends Model implements HasMedia
         static::saving(fn (Contact $c) => $c->type === 'external' ? $c->user_id = null : null);
     }
 
-    public function location(): BelongsTo
+    /** Einrichtungen, für die der Ansprechpartner gilt. Keine Zuordnung = alle Einrichtungen */
+    public function locations(): BelongsToMany
     {
-        return $this->belongsTo(Location::class);
+        return $this->belongsToMany(Location::class)->orderBy('locations.sort');
+    }
+
+    /** Gilt für diese Einrichtung: dort zugeordnet oder ohne Zuordnung (alle) */
+    public function scopeForLocation(Builder $query, ?int $locationId): Builder
+    {
+        return $query->where(fn ($q) => $q->whereDoesntHave('locations')
+            ->when($locationId, fn ($q) => $q->orWhereHas('locations', fn ($l) => $l->where('locations.id', $locationId))));
     }
 
     public function user(): BelongsTo

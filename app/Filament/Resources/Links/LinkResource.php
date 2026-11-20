@@ -23,6 +23,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
@@ -57,8 +58,11 @@ class LinkResource extends Resource
                 ->validationMessages(['regex' => 'Bitte eine Adresse mit https:// angeben oder # als Platzhalter.'])
                 ->helperText('z. B. https://… oder # als Platzhalter'),
             TextInput::make('description')->label('Kurzbeschreibung'),
+            Select::make('category')->label('Bereich')->options(Link::CATEGORIES)->default('schnellzugriff')->required()->live()
+                ->helperText('Schnellzugriff erscheint auf der Startseite, aushangpflichtige Gesetze auf der FAQ-Seite.'),
             Toggle::make('in_menu')->label('Im linken Menü unter Schnellzugriff zeigen')
-                ->helperText('Die Box Schnellzugriff auf der Startseite zeigt weiterhin alle Weiterleitungen.'),
+                ->helperText('Die Box Schnellzugriff auf der Startseite zeigt weiterhin alle Weiterleitungen dieses Bereichs.')
+                ->visible(fn (Get $get) => $get('category') === 'schnellzugriff'),
         ]);
     }
 
@@ -69,10 +73,11 @@ class LinkResource extends Resource
             ->columns([
                 TextColumn::make('title')->label('Titel')->weight('medium'),
                 TextColumn::make('url')->label('Adresse')->limit(50),
+                TextColumn::make('category')->label('Bereich')->badge()->formatStateUsing(fn ($state) => Link::CATEGORIES[$state] ?? $state),
                 IconColumn::make('in_menu')->label('Im Menü')->boolean(),
             ])
             ->filters([
-
+                SelectFilter::make('category')->label('Bereich')->options(Link::CATEGORIES),
             ])
             ->recordActions([
                 EditAction::make(),

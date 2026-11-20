@@ -5,9 +5,9 @@ namespace App\Filament\Resources\Contacts;
 use App\Filament\Resources\Contacts\Pages\ManageContacts;
 use App\Filament\Support\Fields;
 use App\Filament\Support\GesamtAdminOnly;
-use App\Filament\Support\StaffAdminOnly;
 use App\Filament\Support\ScopedContent;
 use App\Models\Contact;
+use App\Models\Location;
 use App\Models\User;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -32,13 +32,11 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 class ContactResource extends Resource
 {
-    use StaffAdminOnly;
-
-
     protected static ?string $model = Contact::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhone;
@@ -50,6 +48,32 @@ class ContactResource extends Resource
     protected static ?string $modelLabel = 'Ansprechpartner';
 
     protected static ?string $pluralModelLabel = 'Ansprechpartner';
+
+    /** Ansprechpartner hängen an Einrichtungen: Gesamt-Admin und Standort-Admins pflegen sie (Abstimmung 20.11.2026) */
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasAnyRole(['gesamt-admin', 'standort-admin']) ?? false;
+    }
+
+    /** Standort-Admins sehen nur Partner, die ausschließlich eigenen Einrichtungen zugeordnet sind */
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+        if (! $user || $user->isGesamtAdmin()) {
+            return $query;
+        }
+        $own = $user->adminLocationIds() ?: [0];
+
+        return $query->whereHas('locations', fn ($l) => $l->whereIn('locations.id', $own))
+            ->whereDoesntHave('locations', fn ($l) => $l->whereNotIn('locations.id', $own));
+    }
+
+    /** Einrichtungen, die die angemeldete Person zuordnen darf */
+    protected static function allowedLocationIds(): array
+    {
+        return auth()->user()?->adminLocationIds() ?? [];
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -67,14 +91,24 @@ class ContactResource extends Resource
                         $get('name') ?: $set('name', $u->name);
                         $get('phone') ?: $set('phone', $u->fullExtension() ?: $u->phone);
                         $get('email') ?: $set('email', $u->work_email ?: $u->email);
-                        $get('location_id') ?: $set('location_id', $u->location_id);
+                        if (! $get('locations') && $u->location_id && in_array($u->location_id, static::allowedLocationIds())) {
+                            $set('locations', [(string) $u->location_id]);
+                        }
                     }
                 })
                 ->helperText('Name, Telefon und E-Mail werden übernommen, wenn die Felder noch leer sind.')
                 ->visible(fn (Get $get) => $get('type') === 'internal'),
-            TextInput::make('name')->label('Name')->required(),
+            TextInput::make('name')->label(fn (Get $get) => $get('type') === 'external' ? 'Firma oder Name' : 'Name')->required(),
+            TextInput::make('contact_person')->label('Ansprechpartner bei der Firma')->placeholder('z. B. Frau Muster')
+                ->visible(fn (Get $get) => $get('type') === 'external'),
             TextInput::make('responsibility')->label('Zuständigkeit')->required()->placeholder('z. B. Personalabteilung · Verträge, Urlaub'),
-            Select::make('location_id')->label('Standort')->relationship('location', 'short_name')->placeholder('standortübergreifend'),
+            Select::make('locations')->label('Einrichtungen')->multiple()->preload()
+                ->relationship('locations', 'short_name', fn (Builder $query) => $query->whereIn('locations.id', static::allowedLocationIds()))
+                // nur erlaubte Einrichtungen speichern, auch wenn jemand andere IDs mitschickt
+                ->saveRelationshipsUsing(fn (Contact $record, ?array $state) => $record->locations()->sync(array_values(array_intersect(
+                    array_map('intval', $state ?? []), static::allowedLocationIds()))))
+                ->required(fn () => ! auth()->user()?->isGesamtAdmin())
+                ->helperText(fn () => auth()->user()?->isGesamtAdmin() ? 'Leer lassen, wenn der Ansprechpartner für alle Einrichtungen gilt.' : null),
             TextInput::make('phone')->label('Telefon')->tel(),
             TextInput::make('email')->label('E-Mail')->email(),
             TextInput::make('availability')->label('Erreichbarkeit')->placeholder('z. B. Mo bis Do 8 bis 12 Uhr'),
@@ -92,11 +126,15 @@ class ContactResource extends Resource
                 TextColumn::make('type')->label('Art')->badge()->formatStateUsing(fn ($state) => Contact::TYPES[$state] ?? $state)
                     ->color(fn ($state) => $state === 'external' ? 'warning' : 'info'),
                 TextColumn::make('responsibility')->label('Zuständigkeit')->wrap(),
-                TextColumn::make('location.short_name')->label('Standort')->placeholder('alle'),
+                TextColumn::make('contact_person')->label('Ansprechpartner')->toggleable(),
+                TextColumn::make('locations.short_name')->label('Einrichtungen')->badge()->placeholder('alle'),
                 TextColumn::make('phone')->label('Telefon'),
             ])
             ->filters([
                 SelectFilter::make('type')->label('Art')->options(Contact::TYPES),
+                SelectFilter::make('location')->label('Einrichtung')
+                    ->options(fn () => Location::whereIn('id', static::allowedLocationIds())->orderBy('sort')->pluck('short_name', 'id'))
+                    ->query(fn (Builder $query, array $data) => $data['value'] ? $query->forLocation((int) $data['value']) : $query),
             ])
             ->recordActions([
                 EditAction::make(),

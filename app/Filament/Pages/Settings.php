@@ -6,6 +6,7 @@ use App\Models\Setting;
 use BackedEnum;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Actions;
@@ -29,7 +30,7 @@ class Settings extends Page
 
     public ?array $data = [];
 
-    public const KEYS = ['classified_topics', 'suggestion_topics', 'suggestion_recipients', 'referral_recipients', 'faq_recipients', 'referral_text', 'help_text'];
+    public const KEYS = ['classified_topics', 'suggestion_topics', 'suggestion_recipients', 'referral_recipients', 'faq_recipients', 'referral_text', 'help_text', 'chat_uploads', 'chat_retention_days', 'chat_rules'];
 
     public static function canAccess(): bool
     {
@@ -40,6 +41,8 @@ class Settings extends Page
     {
         $this->form->fill(collect(self::KEYS)->mapWithKeys(fn ($k) => [$k => Setting::get($k)])->all()
             + ['classified_topics' => Setting::get('classified_topics', \App\Models\Classified::DEFAULT_TOPICS)]);
+        $this->data['chat_uploads'] = (bool) Setting::get('chat_uploads', false);
+        $this->data['chat_retention_days'] = (int) Setting::get('chat_retention_days', 365);
     }
 
     public function form(Schema $schema): Schema
@@ -54,6 +57,15 @@ class Settings extends Page
             Section::make('Weitere Empfänger')->schema([
                 TextInput::make('faq_recipients')->label('Eingereichte FAQ-Fragen')->helperText($hint),
                 TextInput::make('referral_recipients')->label('Mitarbeiter werben Mitarbeiter')->helperText($hint),
+            ])->columns(2),
+            Section::make('Chat')->schema([
+                Toggle::make('chat_uploads')->label('Bilder und Dateien im Chat erlauben')
+                    ->helperText('Aus: Im Chat kann nur Text geschrieben werden. Bereits geteilte Dateien bleiben sichtbar.'),
+                TextInput::make('chat_retention_days')->label('Nachrichten automatisch löschen nach (Tage)')
+                    ->numeric()->minValue(0)->maxValue(3650)->required()
+                    ->helperText('Gilt für alle Gruppen und Direktchats. 0 = dauerhaft speichern. Je Gruppe abweichend unter Inhalte > Chatgruppen. Gelöschte Nachrichten und Dateien sind endgültig weg.'),
+                Textarea::make('chat_rules')->label('Chatregeln')->rows(8)->columnSpanFull()
+                    ->helperText('Erscheint im Chat über das Waage-Symbol und beim ersten Öffnen einmal als Hinweis. Links (https://…) werden anklickbar.'),
             ])->columns(2),
             Section::make('Marktplatz')->schema([
                 Textarea::make('classified_topics')->label('Kategorien (eine pro Zeile)')->rows(7)

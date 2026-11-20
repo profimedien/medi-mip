@@ -14,7 +14,7 @@ class ContactShow extends Component
         return view('livewire.contact-show', [
             'photo' => $this->contact->getFirstMedia('photo'),
             'others' => Contact::where('id', '!=', $this->contact->id)
-                ->where(fn ($q) => $q->whereNull('location_id')->orWhere('location_id', $this->contact->location_id))
+                ->forLocation(auth()->user()?->location_id)
                 ->orderBy('sort')->limit(4)->get(),
         ])->title($this->contact->name);
     }

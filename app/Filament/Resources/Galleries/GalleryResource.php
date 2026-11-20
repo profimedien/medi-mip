@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Galleries;
 use App\Filament\Resources\Galleries\Pages\ManageGalleries;
 use App\Filament\Support\Fields;
 use App\Filament\Support\GesamtAdminOnly;
+use App\Filament\Support\RedaktionOnly;
 use App\Filament\Support\ScopedContent;
 use App\Models\Gallery;
 use BackedEnum;
@@ -32,7 +33,7 @@ use UnitEnum;
 
 class GalleryResource extends Resource
 {
-    use ScopedContent;
+    use RedaktionOnly, ScopedContent;
 
     protected static ?string $model = Gallery::class;
 

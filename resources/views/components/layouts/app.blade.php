@@ -30,7 +30,7 @@
                     <x-avatar :user="$user" class="size-8 text-xs" />
                     <span class="hidden text-sm font-medium md:block">{{ $user->first_name }}</span>
                 </a>
-                @if ($user->isAdmin())
+                @if ($user->hasRedaktionAccess())
                     <a href="/admin" class="hidden rounded-xl px-3 py-2 text-sm font-medium text-medi-blue hover:bg-medi-bg md:block">Redaktion</a>
                 @endif
             </div>
@@ -142,7 +142,7 @@
             </div>
         @endif
         <div class="mt-4 flex gap-3">
-            @if ($user->isAdmin())
+            @if ($user->hasRedaktionAccess())
                 <a href="/admin" class="btn-ghost flex-1">Redaktion</a>
             @endif
             <form method="POST" action="{{ route('logout') }}" class="flex-1">

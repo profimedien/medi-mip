@@ -8,6 +8,7 @@ use App\Filament\Resources\Forms\Pages\ListForms;
 use App\Filament\Resources\Forms\RelationManagers\ResponsesRelationManager;
 use App\Filament\Resources\Forms\Schemas\FormForm;
 use App\Filament\Resources\Forms\Tables\FormsTable;
+use App\Filament\Support\RedaktionOnly;
 use App\Filament\Support\ScopedContent;
 use App\Models\Form;
 use BackedEnum;
@@ -19,7 +20,7 @@ use UnitEnum;
 
 class FormResource extends Resource
 {
-    use ScopedContent;
+    use RedaktionOnly, ScopedContent;
 
     protected static ?string $model = Form::class;
 

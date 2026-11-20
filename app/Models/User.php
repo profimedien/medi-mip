@@ -35,6 +35,7 @@ class User extends Authenticatable implements FilamentUser, HasMedia, HasName
         'standort-admin' => 'Standort-Admin',
         'abteilungs-admin' => 'Abteilungsleitung (Admin)',
         'fachliche-leitung' => 'Fachliche Leitung',
+        'chat-uebersicht' => 'Chat-Übersicht (nur Gruppenliste)',
         'mitarbeiter' => 'Mitarbeiter/in',
     ];
 
@@ -141,7 +142,19 @@ class User extends Authenticatable implements FilamentUser, HasMedia, HasName
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->status === 'active' && $this->hasAnyRole(self::ADMIN_ROLES);
+        return $this->status === 'active' && $this->hasRedaktionAccess();
+    }
+
+    /** Redaktion öffnen: Admin-Rollen oder Chat-Übersicht (z. B. Geschäftsleitung, sieht nur die Gruppenliste) */
+    public function hasRedaktionAccess(): bool
+    {
+        return $this->hasAnyRole([...self::ADMIN_ROLES, 'chat-uebersicht']);
+    }
+
+    /** Liste aller Chatgruppen ohne Inhalte */
+    public function canSeeChatOverview(): bool
+    {
+        return $this->hasAnyRole(['gesamt-admin', 'chat-uebersicht']);
     }
 
     public function isGesamtAdmin(): bool

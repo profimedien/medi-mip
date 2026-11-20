@@ -28,7 +28,7 @@ class Home extends Component
             'events' => Event::visibleTo($user)->where('starts_at', '>=', now()->startOfDay())->orderBy('starts_at')->limit(3)->get(),
             'today' => app(CalendarFeed::class)->between($user, CarbonImmutable::today(), CarbonImmutable::today(), $user->location_id)
                 ->whereIn('type', ['birthday', 'anniversary'])->values(),
-            'links' => Link::orderBy('sort')->get(),
+            'links' => Link::category('schnellzugriff')->orderBy('sort')->get(),
         ]);
     }
 }

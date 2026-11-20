@@ -22,7 +22,10 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
-/** Chat: automatische Gruppen ansehen, eigene Gruppen anlegen. Direktchats bleiben privat. */
+/**
+ * Chat: automatische Gruppen ansehen, eigene Gruppen anlegen, Speicherdauer je Gruppe. Direktchats bleiben privat.
+ * Rolle Chat-Übersicht (z. B. Geschäftsleitung): nur die Liste, ohne Bearbeiten und ohne Inhalte.
+ */
 class ChatGroupResource extends Resource
 {
     protected static ?string $model = ChatGroup::class;
@@ -39,6 +42,11 @@ class ChatGroupResource extends Resource
 
     public static function canAccess(): bool
     {
+        return auth()->user()?->canSeeChatOverview() ?? false;
+    }
+
+    public static function canManage(): bool
+    {
         return auth()->user()?->isGesamtAdmin() ?? false;
     }
 
@@ -53,6 +61,8 @@ class ChatGroupResource extends Resource
             TextInput::make('name')->label('Name')->required()
                 ->disabled(fn (?ChatGroup $record) => $record && $record->type !== 'custom'),
             Toggle::make('read_only')->label('Nur Moderation darf schreiben (Ankündigungskanal)'),
+            TextInput::make('retention_days')->label('Speicherdauer in Tagen')->numeric()->minValue(0)->maxValue(3650)->nullable()
+                ->helperText(fn () => 'Leer = Einstellung für alle ('.((int) \App\Models\Setting::get('chat_retention_days', 365) ?: 'dauerhaft').(((int) \App\Models\Setting::get('chat_retention_days', 365)) ? ' Tage' : '').'). 0 = dauerhaft speichern. Ältere Nachrichten samt Dateien werden endgültig gelöscht.'),
             Select::make('member_ids')->label('Mitglieder')->multiple()->searchable()
                 ->visible(fn (?ChatGroup $record) => ! $record || $record->type === 'custom')
                 ->getSearchResultsUsing(fn (string $s) => User::where('status', '!=', 'disabled')
@@ -78,6 +88,9 @@ class ChatGroupResource extends Resource
                 TextColumn::make('members_count')->counts('members')->label('Mitglieder'),
                 TextColumn::make('messages_count')->counts('messages')->label('Nachrichten'),
                 IconColumn::make('read_only')->label('Nur Moderation')->boolean(),
+                TextColumn::make('retention_days')->label('Speicherdauer')
+                    ->state(fn (ChatGroup $r) => $r->effectiveRetentionDays() ? $r->effectiveRetentionDays().' Tage' : 'dauerhaft')
+                    ->description(fn (ChatGroup $r) => $r->retention_days === null ? 'Standard' : 'eigene Frist'),
                 TextColumn::make('last_message_at')->label('Letzte Nachricht')->since(),
             ])
             ->filters([SelectFilter::make('type')->label('Art')->options(array_diff_key(ChatGroup::TYPES, ['direct' => 1]))])
@@ -85,21 +98,24 @@ class ChatGroupResource extends Resource
                 Action::make('edit')->label('Bearbeiten')->icon('heroicon-o-pencil-square')
                     ->schema(fn (Schema $schema) => static::form($schema))
                     ->fillForm(fn (ChatGroup $r) => [
-                        'name' => $r->name, 'read_only' => $r->read_only,
+                        'name' => $r->name, 'read_only' => $r->read_only, 'retention_days' => $r->retention_days,
                         'member_ids' => $r->members()->pluck('user_id')->all(),
                         'moderator_ids' => $r->members()->where('is_moderator', true)->pluck('user_id')->all(),
                     ])
-                    ->action(fn (ChatGroup $r, array $data) => static::saveGroup($r, $data)),
+                    ->action(fn (ChatGroup $r, array $data) => static::saveGroup($r, $data))
+                    ->visible(fn () => static::canManage()),
                 Action::make('open')->label('Im Portal öffnen')->icon('heroicon-o-arrow-top-right-on-square')->color('gray')
                     ->url(fn (ChatGroup $r) => route('chat', $r), shouldOpenInNewTab: true)
-                    ->visible(fn (ChatGroup $r) => $r->members()->where('user_id', auth()->id())->exists()),
-                DeleteAction::make()->visible(fn (ChatGroup $r) => $r->type === 'custom'),
+                    ->visible(fn (ChatGroup $r) => static::canManage() && $r->members()->where('user_id', auth()->id())->exists()),
+                DeleteAction::make()->visible(fn (ChatGroup $r) => static::canManage() && $r->type === 'custom'),
             ]);
     }
 
     public static function saveGroup(ChatGroup $group, array $data): void
     {
-        $group->fill(['read_only' => (bool) ($data['read_only'] ?? false)]);
+        abort_unless(static::canManage(), 403);
+        $retention = $data['retention_days'] ?? null;
+        $group->fill(['read_only' => (bool) ($data['read_only'] ?? false), 'retention_days' => $retention === null || $retention === '' ? null : (int) $retention]);
         if ($group->type === 'custom' || ! $group->exists) {
             $group->name = $data['name'];
         }

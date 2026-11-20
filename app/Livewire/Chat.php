@@ -5,7 +5,9 @@ namespace App\Livewire;
 use App\Models\ChatGroup;
 use App\Models\ChatMember;
 use App\Models\ChatMessage;
+use App\Models\Setting;
 use App\Models\User;
+use App\Services\ChatPruner;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -55,9 +57,15 @@ class Chat extends Component
 
     public int $limit = 50;
 
+    public bool $showRules = false;
+
     public function mount(?ChatGroup $group = null): void
     {
         $user = auth()->user();
+        ChatPruner::runIfDue(); // Speicherdauer: ohne Cronjob beim Aufruf, höchstens einmal am Tag
+
+        // Chatregeln beim ersten Öffnen einmal zeigen
+        $this->showRules = ! $user->chat_rules_seen_at && filled(Setting::get('chat_rules'));
 
         if ($this->direct && $this->direct !== $user->id) {
             // auch Kolleginnen und Kollegen, die sich noch nicht angemeldet haben (Status "eingeladen"): Nachricht wartet auf sie
@@ -74,6 +82,23 @@ class Chat extends Component
         }
     }
 
+    public static function uploadsAllowed(): bool
+    {
+        return (bool) Setting::get('chat_uploads', false);
+    }
+
+    public function toggleRules(): void
+    {
+        $this->showRules = ! $this->showRules;
+    }
+
+    /** Chatregeln gelesen: Hinweis erscheint nicht mehr von selbst */
+    public function acceptRules(): void
+    {
+        auth()->user()->forceFill(['chat_rules_seen_at' => now()])->save();
+        $this->showRules = false;
+    }
+
     public function markRead(): void
     {
         if (! $this->group) {
@@ -87,6 +112,12 @@ class Chat extends Component
     public function send(): void
     {
         abort_unless($this->group && $this->group->canWrite(auth()->user()), 403);
+        if ($this->upload && ! self::uploadsAllowed()) {
+            $this->reset('upload');
+            $this->addError('upload', 'Bilder und Dateien sind im Chat derzeit nicht freigeschaltet.');
+
+            return;
+        }
         $this->validate([
             'body' => ['nullable', 'string', 'max:4000', 'required_without:upload'],
             'upload' => ['nullable', 'file', 'max:15360', 'mimes:jpg,jpeg,png,webp,heic,pdf,doc,docx,xls,xlsx'],
@@ -266,13 +297,17 @@ class Chat extends Component
         $foundMessages = collect();
         if (mb_strlen($term) >= 2) {
             $needle = mb_strtolower($term);
+            // Text liegt verschlüsselt in der Datenbank: die letzten Nachrichten der eigenen Unterhaltungen laden und nach dem Entschlüsseln filtern
             $foundMessages = ChatMessage::query()
                 ->join('chat_members as cm', fn ($j) => $j->on('cm.chat_group_id', '=', 'chat_messages.chat_group_id')->where('cm.user_id', $user->id))
                 ->whereColumn('chat_messages.id', '>', 'cm.visible_from_message_id')
                 ->select('chat_messages.*')
                 ->whereNull('chat_messages.deleted_at')
-                ->where('chat_messages.body', 'like', '%'.addcslashes($term, '%_\\').'%')
-                ->with('user', 'group.users')->latest('chat_messages.id')->limit(30)->get();
+                ->whereNotNull('chat_messages.body')
+                ->latest('chat_messages.id')->limit(2000)->get()
+                ->filter(fn (ChatMessage $m) => str_contains(mb_strtolower((string) $m->body), $needle))
+                ->take(30)->values()
+                ->load('user', 'group.users');
             $groups = $groups->filter(fn (ChatGroup $g) => str_contains(mb_strtolower($g->titleFor($user)), $needle))->values();
         }
 
@@ -302,6 +337,9 @@ class Chat extends Component
 
         return view('livewire.chat', [
             'foundMessages' => $foundMessages,
+            'uploadsAllowed' => self::uploadsAllowed(),
+            'chatRules' => (string) Setting::get('chat_rules', ''),
+            'retentionDays' => $this->group?->effectiveRetentionDays(),
             'inviteResults' => $inviteResults,
             'canInvite' => $this->group?->canInvite($user) ?? false,
             'canModerate' => $this->group?->canModerate($user) ?? false,

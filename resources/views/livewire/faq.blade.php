@@ -35,6 +35,26 @@
         <p class="card text-sm">Keine passenden Einträge gefunden.</p>
     @endforelse
 
+    @if ($laws->isNotEmpty())
+        <section class="card">
+            <details class="group">
+                <summary class="flex cursor-pointer list-none items-center justify-between gap-3">
+                    <span class="font-bold">Aushangpflichtige Gesetze</span>
+                    <x-heroicon-o-chevron-down class="size-4 shrink-0 transition group-open:rotate-180" />
+                </summary>
+                <p class="mt-2 text-sm">Offizielle Fassung auf gesetze-im-internet.de, dort immer aktuell.</p>
+                <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                    @foreach ($laws as $law)
+                        <a href="{{ $law->url }}" target="_blank" rel="noopener" class="rounded-xl bg-medi-bg p-3 text-sm hover:bg-medi-blue/5">
+                            <span class="flex items-center gap-1.5 font-medium text-medi-navy"><x-heroicon-o-scale class="size-4 shrink-0" /> {{ $law->title }}</span>
+                            @if ($law->description)<span class="mt-0.5 block text-xs">{{ $law->description }}</span>@endif
+                        </a>
+                    @endforeach
+                </div>
+            </details>
+        </section>
+    @endif
+
     <section class="card">
         <h2 class="mb-1 font-bold">Ihre Frage fehlt?</h2>
         <p class="mb-3 text-sm">Reichen Sie sie ein. Die Redaktion beantwortet sie und nimmt sie bei Bedarf in die FAQ auf.</p>

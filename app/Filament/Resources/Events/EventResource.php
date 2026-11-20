@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Events;
 use App\Filament\Resources\Events\Pages\ManageEvents;
 use App\Filament\Support\Fields;
 use App\Filament\Support\GesamtAdminOnly;
+use App\Filament\Support\RedaktionOnly;
 use App\Filament\Support\ScopedContent;
 use App\Models\Event;
 use BackedEnum;
@@ -32,7 +33,7 @@ use UnitEnum;
 
 class EventResource extends Resource
 {
-    use ScopedContent;
+    use RedaktionOnly, ScopedContent;
 
     protected static ?string $model = Event::class;
 

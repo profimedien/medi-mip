@@ -20,7 +20,15 @@ class ChatGroup extends Model
 
     protected $guarded = ['id'];
 
-    protected $casts = ['read_only' => 'boolean', 'members_can_invite' => 'boolean', 'history_for_new_members' => 'boolean', 'last_message_at' => 'datetime'];
+    protected $casts = ['read_only' => 'boolean', 'members_can_invite' => 'boolean', 'history_for_new_members' => 'boolean', 'retention_days' => 'integer', 'last_message_at' => 'datetime'];
+
+    /** Speicherdauer in Tagen: Gruppenwert, sonst globale Einstellung. null = dauerhaft */
+    public function effectiveRetentionDays(): ?int
+    {
+        $days = $this->retention_days ?? (int) Setting::get('chat_retention_days', 365);
+
+        return $days > 0 ? $days : null;
+    }
 
     public function members(): HasMany
     {

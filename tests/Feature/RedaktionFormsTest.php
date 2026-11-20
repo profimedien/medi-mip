@@ -41,6 +41,27 @@ class RedaktionFormsTest extends TestCase
         $this->assertSame($colleague->id, Contact::where('name', 'Petra Intern')->value('user_id'));
     }
 
+    public function test_standort_admin_legt_partner_fuer_eigene_einrichtung_an(): void
+    {
+        $admin = $this->person('Fürth', ['Rezeption']);
+        $admin->assignRole('standort-admin');
+        \App\Models\AdminScope::create(['user_id' => $admin->id, 'location_id' => $this->location('Fürth')->id]);
+        $this->actingAs($admin->fresh());
+
+        Livewire::test(ManageContacts::class)->callAction('create', data: [
+            'type' => 'external', 'name' => 'EDV Fürth', 'contact_person' => 'Herr Muster', 'responsibility' => 'IT',
+            'locations' => [(string) $this->location('Fürth')->id],
+        ])->assertHasNoErrors();
+        $contact = Contact::where('name', 'EDV Fürth')->first();
+        $this->assertSame('Herr Muster', $contact->contact_person);
+        $this->assertSame([$this->location('Fürth')->id], $contact->locations->pluck('id')->all());
+
+        Livewire::test(ManageContacts::class)->callAction('create', data: [
+            'type' => 'external', 'name' => 'Ohne Einrichtung', 'responsibility' => 'IT', 'locations' => [],
+        ]);
+        $this->assertFalse(Contact::where('name', 'Ohne Einrichtung')->exists(), 'Standort-Admin muss eine Einrichtung wählen');
+    }
+
     public function test_termin_als_fortbildung(): void
     {
         $this->admin();

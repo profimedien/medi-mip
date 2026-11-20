@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'account.ready' => \App\Http\Middleware\EnsureAccountReady::class,
         ]);
+        $middleware->append(\App\Http\Middleware\StrictTransportSecurity::class);
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(fn () => route('home'));
     })

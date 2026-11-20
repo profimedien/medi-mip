@@ -11,7 +11,8 @@
             @endif
             <h1 class="mt-3 text-2xl font-bold">{{ $contact->name }}</h1>
             <p class="font-medium text-medi-blue">{{ $contact->responsibility }}</p>
-            @if ($contact->location)<p class="mt-1 text-sm">{{ $contact->location->name }}</p>@endif
+            @if ($contact->contact_person)<p class="mt-1 text-sm">Ansprechpartner: {{ $contact->contact_person }}</p>@endif
+            <p class="mt-1 text-sm">{{ $contact->locations->isEmpty() ? 'Alle Einrichtungen' : $contact->locations->pluck('name')->join(', ') }}</p>
             @if ($contact->type === 'external')<p class="mt-1"><span class="badge">Externer Ansprechpartner</span></p>@endif
 
             @if ($contact->description)

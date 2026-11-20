@@ -11,6 +11,12 @@ use Filament\Widgets\Widget;
 /** Rücklauf offener Rückmeldungen und Lesebestätigungen auf einen Blick */
 class RedaktionOverview extends Widget
 {
+    // nicht für die reine Chat-Übersicht
+    public static function canView(): bool
+    {
+        return auth()->user()?->isAdmin() ?? false;
+    }
+
     protected static ?int $sort = 2;
 
     protected int|string|array $columnSpan = 'full';

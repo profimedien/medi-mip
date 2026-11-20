@@ -7,6 +7,7 @@ use App\Filament\Resources\Posts\Pages\EditPost;
 use App\Filament\Resources\Posts\Pages\ListPosts;
 use App\Filament\Resources\Posts\Schemas\PostForm;
 use App\Filament\Resources\Posts\Tables\PostsTable;
+use App\Filament\Support\RedaktionOnly;
 use App\Filament\Support\ScopedContent;
 use App\Models\Post;
 use BackedEnum;
@@ -18,7 +19,7 @@ use UnitEnum;
 
 class PostResource extends Resource
 {
-    use ScopedContent;
+    use RedaktionOnly, ScopedContent;
 
     protected static ?string $model = Post::class;
 

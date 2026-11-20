@@ -30,4 +30,17 @@ class DirectoryContactsTest extends TestCase
         Livewire::actingAs($colleague)->test(Contacts::class)->assertSee('Petra Intern')->assertSee('EDV Schmidt')
             ->set('type', 'external')->assertSee('EDV Schmidt')->assertDontSee('Petra Intern');
     }
+
+    public function test_ansprechpartner_standardmaessig_nach_eigener_einrichtung(): void
+    {
+        $user = $this->person('Roth');
+        Contact::create(['type' => 'external', 'name' => 'Steuerbüro Alle', 'responsibility' => 'Steuer']);
+        Contact::create(['type' => 'external', 'name' => 'EDV Roth', 'responsibility' => 'IT'])->locations()->sync([$this->location('Roth')->id]);
+        Contact::create(['type' => 'external', 'name' => 'EDV Fürth', 'responsibility' => 'IT'])->locations()->sync([$this->location('Fürth')->id]);
+
+        Livewire::actingAs($user)->test(Contacts::class)
+            ->assertSet('location', (string) $this->location('Roth')->id)
+            ->assertSee('Steuerbüro Alle')->assertSee('EDV Roth')->assertDontSee('EDV Fürth')
+            ->set('location', 'alle')->assertSee('EDV Fürth');
+    }
 }

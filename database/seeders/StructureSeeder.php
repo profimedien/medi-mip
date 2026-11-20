@@ -65,6 +65,10 @@ class StructureSeeder extends Seeder
             Link::updateOrCreate(['title' => $title], ['url' => $url, 'description' => $desc, 'sort' => $i, 'in_menu' => $title !== 'medi-Website']);
         }
 
+        foreach (Link::LAWS as $i => [$title, $url, $desc]) {
+            Link::updateOrCreate(['title' => $title], ['url' => $url, 'description' => $desc, 'sort' => $i, 'in_menu' => false, 'category' => 'gesetze']);
+        }
+
         foreach ([
             'suggestion_topics' => "Abläufe\nAusstattung\nIT\nArbeitsplatz\nSonstiges",
             'suggestion_recipients' => 'info@profimedien.net',

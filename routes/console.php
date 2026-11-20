@@ -7,4 +7,5 @@ Schedule::command('mip:notify')->everyMinute()->withoutOverlapping();
 Schedule::command('queue:work --stop-when-empty --max-time=50')->everyMinute()->withoutOverlapping();
 Schedule::command('mip:sync-chat')->hourly();
 Schedule::command('mip:chat-digest')->dailyAt('17:00');
+Schedule::command('mip:chat-prune')->dailyAt('03:00'); // solange kein Cronjob läuft, zusätzlich beim Aufruf des Chats (ChatPruner::runIfDue)
 Schedule::command('media-library:clean --force')->weekly();
